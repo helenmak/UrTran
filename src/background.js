@@ -1,4 +1,5 @@
-chrome.runtime.onInstalled.addListener(function() {
+chrome.runtime.onInstalled.addListener(function(data) {
+  console.log("onMessage1:", data);
   chrome.storage.sync.set({color: '#3aa757'}, function() {
     console.log("The color is green.");
 
@@ -12,4 +13,8 @@ chrome.runtime.onInstalled.addListener(function() {
       }]);
     });
   });
+});
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log("onMessage:", request);
 });

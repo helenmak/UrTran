@@ -1,12 +1,14 @@
 <template>
-    <div
+    <button
       :class="popupClasses"
       :style="{
         position: 'absolute',
         top: top + 'px',
         left: left + 'px'
       }"
-    >POPUP</div>
+      @click.stop="handlePopupClick"
+    >POPUP
+    </button>
 </template>
 
 <script>
@@ -27,7 +29,13 @@
     },
     computed: {
       popupClasses () {
-        return this.visible ? 'visible popup' : 'hidden popup';
+        return this.visible ? 'visible urTranPopup' : 'hidden urTranPopup';
+      }
+    },
+    methods: {
+      handlePopupClick(event) {
+        window.postMessage('popupClick', '*')
+        console.log('click 2 inside component')
       }
     },
     created () {
@@ -37,8 +45,14 @@
 </script>
 
 <style scoped>
-  .popup {
+  .urTranPopup {
     position: absolute;
     background-color: red;
+    cursor: pointer;
+    border: none;
+  }
+
+  .urTranPopup:focus {
+    outline: 1px auto darkred;
   }
 </style>

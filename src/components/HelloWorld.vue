@@ -1,11 +1,6 @@
 <template>
   <div class="hello">
     <button ref="changeColor" @click="changeColor">{{msg}}</button>
-    <page-popup
-      :visible="pagePopupVisible"
-      :top="pagePopupTop"
-      :left="pagePopupLeft"
-    />
   </div>
 </template>
 
@@ -38,13 +33,17 @@
         //     {code: './SelectionPopup.js'})
         // });
       },
+      log() {
+        console.log('log click')
+      },
       handleSelectionChange() {
         const selection = window.getSelection()
         const selectionText = selection.toString()
-        if (selectionText) this.trackSelection = true;
+        console.log('selectionText', selectionText, Boolean(selectionText.trim()))
+        if (selectionText.trim()) this.trackSelection = true;
       },
       handleClick(event) {
-        console.log('click')
+        console.log('click target', event.target)
         if (this.trackSelection) {
           console.log('clickif')
           const selection = window.getSelection()
@@ -86,8 +85,8 @@
       }
     },
     created() {
-      console.log('started translator Hello')
       const divEl = document.createElement('div')
+      divEl.id = 'urTran'
       this.popupContainer = document.body.appendChild(divEl)
       document.addEventListener('selectionchange', debounce(this.handleSelectionChange))
       document.addEventListener('selectstart', this.hidePopup)
@@ -98,21 +97,5 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  h1, h2 {
-    font-weight: normal;
-  }
 
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
-
-  a {
-    color: #42b983;
-  }
 </style>
