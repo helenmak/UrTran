@@ -1,38 +1,30 @@
 <template>
-  <div class="hello">
-    <button ref="changeColor" @click="changeColor">{{msg}}</button>
-  </div>
+  <div class="hello"></div>
 </template>
 
 <script>
   import Vue from 'vue';
-  import PagePopup from './PagePopup';
+  import PopupIcon from './PopupIcon';
+  import Popup from './Popup';
 
   import debounce from 'lodash.debounce';
 
   export default {
     name: 'HelloWorld',
-    components: { PagePopup },
+    components: { PopupIcon, Popup },
     data() {
       return {
         msg: 'Welcome to Your Vue.js App',
         selectionText: '',
+        selectionRect: null,
         pagePopupVisible: false,
         pagePopupTop: 0,
         pagePopupLeft: 0,
+        popupVisible: false,
         trackSelection: false
       }
     },
     methods: {
-      changeColor(element) {
-        let color = '#3aa757'
-        // chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        //   chrome.tabs.executeScript(
-        //     tabs[0].id,
-        //     // {code: 'document.body.style.backgroundColor = "' + color + '";'});
-        //     {code: './SelectionPopup.js'})
-        // });
-      },
       log() {
         console.log('log click')
       },
@@ -42,46 +34,69 @@
         console.log('selectionText', selectionText, Boolean(selectionText.trim()))
         if (selectionText.trim()) this.trackSelection = true;
       },
-      handleClick(event) {
+      handleDocumentClick(event) {
         console.log('click target', event.target)
         if (this.trackSelection) {
           console.log('clickif')
-          const selection = window.getSelection()
-          const selectionText = selection.toString()
-          console.log('selection1', selectionText)
-          const selectionRange = selection.getRangeAt(0) //get the text range
-          const selectionRect = selectionRange.getBoundingClientRect()
 
-          console.log('selectionRect', selectionRect.top)
-          this.selectionText = selectionText
           this.pagePopupTop = event.pageY // selectionRect.top + window.scrollY
           this.pagePopupLeft = event.pageX// selectionRect.left + window.scrollX
-          this.pagePopupVisible = true
+          this.popupIconVisible = true
 
-          const popupComponent = new Vue({
-            ...PagePopup,
+          const popupIconComponent = new Vue({
+            ...PopupIcon,
             parent: this,
             propsData: {
-              visible: this.pagePopupVisible,
               top: this.pagePopupTop,
               left: this.pagePopupLeft
             }
           }).$mount()
+          popupIconComponent.$on('iconClick', this.handleIconClick)
+
           this.popupContainer.innerHTML = '';
-          this.popupContainer.insertAdjacentElement('afterbegin', popupComponent.$el)
+          this.popupContainer.insertAdjacentElement('afterbegin', popupIconComponent.$el)
 
           this.trackSelection = false
         } else {
           console.log('clickelse')
-          this.hidePopup()
+          this.removePopupIcon()
         }
       },
-      hidePopup() {
+      removePopupIcon() {
         this.popupContainer.innerHTML = '';
         this.pagePopupVisible = false
         this.selectionText = ''
         this.pagePopupTop = 0
         this.pagePopupLeft = 0
+      },
+      getSelectionProperties() {
+        const selection = window.getSelection()
+        const selectionRange = selection.getRangeAt(0) //get the text range
+
+        this.selectionText = selection.toString()
+        this.selectionRect = selectionRange.getBoundingClientRect()
+
+        console.log('selection1', this.selectionText)
+      },
+      showPopup() {
+        const popupComponent = new Vue({
+          ...Popup,
+          parent: this,
+          propsData: {
+            top: this.pagePopupTop + 32,
+            left: this.pagePopupLeft,
+            selectionText: this.selectionText,
+            selectionRect: this.selectionRect
+          }
+        }).$mount()
+        // popupComponent.$on('iconClick', this.handleIconClick)
+
+        this.popupContainer.innerHTML = '';
+        this.popupContainer.insertAdjacentElement('afterbegin', popupComponent.$el)
+      },
+      handleIconClick() {
+        this.getSelectionProperties()
+        this.showPopup();
       }
     },
     created() {
@@ -89,8 +104,8 @@
       divEl.id = 'urTran'
       this.popupContainer = document.body.appendChild(divEl)
       document.addEventListener('selectionchange', debounce(this.handleSelectionChange))
-      document.addEventListener('selectstart', this.hidePopup)
-      document.addEventListener('click', this.handleClick)
+      document.addEventListener('selectstart', this.removePopupIcon)
+      document.addEventListener('click', this.handleDocumentClick)
     }
   }
 </script>

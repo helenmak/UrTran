@@ -1,6 +1,6 @@
 <template>
     <button
-      :class="popupClasses"
+      class="urTranPopupIcon"
       :style="{
         position: 'absolute',
         top: top + 'px',
@@ -13,46 +13,34 @@
 
 <script>
   export default {
-    name: 'PagePopup',
+    name: 'PopupIcon',
     props: {
       top: Number,
-      left: Number,
-      visible: {
-        type: Boolean,
-        default: false
-      }
+      left: Number
     },
     watch: {
       top (newVal) {
         console.log('top change', newVal)
       }
     },
-    computed: {
-      popupClasses () {
-        return this.visible ? 'visible urTranPopup' : 'hidden urTranPopup';
-      }
-    },
     methods: {
-      handlePopupClick(event) {
-        window.postMessage('popupClick', '*')
-        console.log('click 2 inside component')
+      handlePopupClick() {
+        this.$emit('iconClick')
+        console.log('iconClick')
       }
-    },
-    created () {
-      console.log('popup created')
     }
   }
 </script>
 
 <style scoped>
-  .urTranPopup {
+  .urTranPopupIcon {
     position: absolute;
     background-color: red;
     cursor: pointer;
     border: none;
   }
 
-  .urTranPopup:focus {
+  .urTranPopupIcon:focus {
     outline: 1px auto darkred;
   }
 </style>
