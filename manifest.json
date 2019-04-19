@@ -34,7 +34,8 @@
     "storage",
     "tabs",
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "https://translation.googleapis.com"
   ],
   "manifest_version": 2
 }

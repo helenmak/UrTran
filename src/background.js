@@ -1,5 +1,6 @@
+const apiv2 = 'https://translation.googleapis.com'
+
 chrome.runtime.onInstalled.addListener(function(data) {
-  console.log("onMessage1:", data);
   chrome.storage.sync.set({color: '#3aa757'}, function() {
     console.log("The color is green.");
 
@@ -15,6 +16,14 @@ chrome.runtime.onInstalled.addListener(function(data) {
   });
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log("onMessage:", request);
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (request.contentScriptQuery === "translateText") {
+      var url = `${apiv2}/language/translate/v2?key=AIzaSyD9vAcdqFJ3PY2pKqsL_gqZgZfFHR7Ff68`
+      fetch(url, { method: 'POST', body: JSON.stringify(request.options) })
+        .then(response => response.json())
+        .then(price => sendResponse(price))
+        .catch(error => console.log('fetch error', error))
+      return true;  // Will respond asynchronously.
+    }
 });
