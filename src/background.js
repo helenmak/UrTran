@@ -16,14 +16,29 @@ chrome.runtime.onInstalled.addListener(function(data) {
   });
 });
 
-chrome.runtime.onMessage.addListener(
+chrome.runtime.onMessage.addListener( // TODO: redo
   function(request, sender, sendResponse) {
-    if (request.contentScriptQuery === "translateText") {
-      var url = `${apiv2}/language/translate/v2?key=AIzaSyD9vAcdqFJ3PY2pKqsL_gqZgZfFHR7Ff68`
-      fetch(url, { method: 'POST', body: JSON.stringify(request.options) })
-        .then(response => response.json())
-        .then(price => sendResponse(price))
-        .catch(error => console.log('fetch error', error))
-      return true;  // Will respond asynchronously.
+    switch(request.contentScriptQuery) {
+      case "translateText":
+        const translateUrl = `${apiv2}/language/translate/v2?key=AIzaSyD9vAcdqFJ3PY2pKqsL_gqZgZfFHR7Ff68`
+        const translateFetchOptions = {
+          method: 'POST',
+          body: JSON.stringify(request.options)
+        }
+        fetch(translateUrl, translateFetchOptions)
+          .then(response => response.json())
+          .then(translated => sendResponse({ data: translated }))
+          .catch(error => sendResponse({ error }))
+        return true;  // Will respond asynchronously.
+      case "getLanguages":
+        let languagesUrl = `${apiv2}/language/translate/v2/languages?key=AIzaSyD9vAcdqFJ3PY2pKqsL_gqZgZfFHR7Ff68`
+        const target = request.options.target;
+        if (target) languagesUrl = `${languagesUrl}&target=${target}`
+        fetch(languagesUrl)
+          .then(response => response.json())
+          .then(languages => sendResponse({ data: languages }))
+          .catch(error => sendResponse({ error }))
+        return true;  // Will respond asynchronously.
     }
 });
+

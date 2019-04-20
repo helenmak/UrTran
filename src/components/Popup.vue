@@ -10,9 +10,14 @@
       <div>
         {{selectionText}}
       </div>
-      <button @click="translateText">
+    <div>-----------</div>
+    <div>
+      {{translatedText}}
+    </div>
+      <button @click.stop="translateText">
         Translate
       </button>
+
   </div>
 </template>
 
@@ -27,10 +32,25 @@
       selectionText: String,
       selectionRect: Object
     },
+    data: () => ({
+      translatedText: '',
+      sourceLanguage: '',
+      targetLanguage: 'uk'
+    }),
     methods: {
-      translateText() {
-        api.translateText(this.selectionText, 'en')
+      async translateText() {
+        const translations = await api.translateText({ text: this.selectionText, target: this.targetLanguage })
+        console.log('translations', translations)
+        this.translatedText = translations.translatedText
+        this.sourceLanguage = translations.detectedSourceLanguage
+      },
+      async getAvailableLanguages(target) {
+        this.languages = await api.getAvailableLanguages({ target })
       }
+    },
+    created(){
+      this.getAvailableLanguages(this.targetLanguage)
+      console.log('navigator.language', navigator.language)
     }
   }
 </script>
