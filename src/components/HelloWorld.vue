@@ -9,6 +9,8 @@
 
   import debounce from 'lodash.debounce';
 
+  import api from '../api/'
+
   export default {
     name: 'HelloWorld',
     components: { PopupIcon, Popup },
@@ -18,56 +20,64 @@
         selectionText: '',
         selectionRect: null,
         pagePopupVisible: false,
-        pagePopupTop: 0,
-        pagePopupLeft: 0,
+        pagePopupIconTop: 0,
+        pagePopupIconLeft: 0,
         popupVisible: false,
-        trackSelection: false
+        trackSelection: false,
+        translations: null
       }
     },
     methods: {
       log() {
         console.log('log click')
       },
-      handleSelectionChange() {
+      async handleSelectionChange() {
         const selection = window.getSelection()
         const selectionText = selection.toString()
-        console.log('selectionText', selectionText, Boolean(selectionText.trim()))
-        if (selectionText.trim()) this.trackSelection = true;
+        console.log('selectionText', selectionText.trim(), selectionText.trim().length)
+        if (selectionText.trim().length) {
+          console.log('set to true')
+          this.trackSelection = true;
+        }
+        else this.trackSelection = false;
       },
-      handleDocumentClick(event) {
+      handleClick(event) {
         console.log('click target', event.target)
         if (this.trackSelection) {
-          console.log('clickif')
-
-          this.pagePopupTop = event.pageY // selectionRect.top + window.scrollY
-          this.pagePopupLeft = event.pageX// selectionRect.left + window.scrollX
-          this.popupIconVisible = true
-
-          const popupIconComponent = new Vue({
-            ...PopupIcon,
-            parent: this,
-            propsData: {
-              top: this.pagePopupTop,
-              left: this.pagePopupLeft
-            }
-          }).$mount()
-          popupIconComponent.$on('iconClick', this.handleIconClick)
-
-          this.popupContainer.innerHTML = '';
-          this.popupContainer.insertAdjacentElement('afterbegin', popupIconComponent.$el)
-
+          this.setIconCoordinates(event)
+          this.showIcon()
+          console.log('set to false')
           this.trackSelection = false
         } else {
-          console.log('clickelse')
-          this.removePopupIcon()
+          this.removeElements()
         }
       },
-      removePopupIcon() {
+      setIconCoordinates(event) {
+        this.pagePopupIconTop = event.pageY // selectionRect.top + window.scrollY
+        this.pagePopupIconLeft = event.pageX// selectionRect.left + window.scrollX
+      },
+      showIcon() {
+        const popupIconComponent = new Vue({
+          ...PopupIcon,
+          parent: this,
+          propsData: {
+            top: this.pagePopupIconTop,
+            left: this.pagePopupIconLeft
+          }
+        }).$mount()
+        popupIconComponent.$on('iconClick', this.handleIconClick)
+
+        this.renderElement(popupIconComponent.$el)
+      },
+      handleSelectStart() {
+        this.removeElements()
+      },
+      removeElements() {
         this.popupContainer.innerHTML = '';
         this.pagePopupVisible = false
         this.selectionText = ''
-        this.pagePopupTop = 0
-        this.pagePopupLeft = 0
+        this.pagePopupIconTop = 0
+        this.pagePopupIconLeft = 0
       },
       getSelectionProperties() {
         const selection = window.getSelection()
@@ -75,28 +85,44 @@
 
         this.selectionText = selection.toString()
         this.selectionRect = selectionRange.getBoundingClientRect()
-
-        console.log('selection1', this.selectionText)
       },
       showPopup() {
         const popupComponent = new Vue({
           ...Popup,
           parent: this,
           propsData: {
-            top: this.pagePopupTop + 32,
-            left: this.pagePopupLeft,
+            top: this.pagePopupIconTop + 32,
+            left: this.pagePopupIconLeft,
             selectionText: this.selectionText,
-            selectionRect: this.selectionRect
+            selectionRect: this.selectionRect,
+            translations: this.translations
           }
         }).$mount()
-        // popupComponent.$on('iconClick', this.handleIconClick)
-
-        this.popupContainer.innerHTML = '';
-        this.popupContainer.insertAdjacentElement('afterbegin', popupComponent.$el)
+        this.renderElement(popupComponent.$el)
       },
-      handleIconClick() {
+      renderElement(el) {
+        this.popupContainer.innerHTML = '';
+        this.popupContainer.insertAdjacentElement('afterbegin', el)
+      },
+      async translateText() {
+        this.translations = await api.translateText({text: this.selectionText, target: 'uk'})
+      },
+      async handleIconClick() {
         this.getSelectionProperties()
-        this.showPopup();
+        await this.translateText()
+        this.showPopup()
+      },
+      async handleDoubleClick(event) {
+        console.log('doubleclick', this.trackSelection)
+        this.getSelectionProperties()
+        if (this.selectionText) {
+          this.setIconCoordinates(event) // just to know where to render poopup
+          await this.translateText()
+          this.showPopup()
+          this.trackSelection = false
+        } else {
+          this.removeElements()
+        }
       }
     },
     created() {
@@ -104,8 +130,9 @@
       divEl.id = 'urTran'
       this.popupContainer = document.body.appendChild(divEl)
       document.addEventListener('selectionchange', debounce(this.handleSelectionChange))
-      document.addEventListener('selectstart', this.removePopupIcon)
-      document.addEventListener('click', this.handleDocumentClick)
+      document.addEventListener('selectstart', this.handleSelectStart)
+      document.addEventListener('click', this.handleClick)
+      document.addEventListener('dblclick', this.handleDoubleClick)
     }
   }
 </script>

@@ -17,7 +17,7 @@ const translateText = async ({ text, source, target = 'uk' }) => {
           else resolve(response.data)
         })
     })
-    console.log('translated', translated, 'translated.data', translated.data)
+    console.log('translated.data', translated.data, 'query ', text)
     return translated.data.translations[0]
   } catch (err) {
     console.log('translateText error: ', err)
