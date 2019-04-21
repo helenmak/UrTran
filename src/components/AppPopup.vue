@@ -57,11 +57,19 @@
     </div>
 
     <button
+      v-if="!addedToDictionary"
       class="dictionary-button"
       @click="addToDictionary"
     >
       Add text to dictionary
     </button>
+
+    <div
+      v-else
+      class="dictionary-text"
+    >
+      Text added to dictionary!
+    </div>
 
   </div>
 </template>
@@ -86,7 +94,8 @@
       browserLanguage: 'uk',
       targetLanguage: 'uk',
       sourceCountriesFlags: null,
-      targetCountriesFlags: null
+      targetCountriesFlags: null,
+      addedToDictionary: false
     }),
     computed: {
       /**
@@ -94,8 +103,8 @@
        * @returns {object} - object with absolute popup coordinates
        */
       popupPosition() {
-        if (this.top) return { top: `${this.top}px`, left: `${this.left}px` }
-        if (this.bottom) return { bottom: `${this.bottom}px`, left: `${this.left}px` }
+        if (this.top) return {top: `${this.top}px`, left: `${this.left}px`}
+        if (this.bottom) return {bottom: `${this.bottom}px`, left: `${this.left}px`}
       }
     },
     watch: {
@@ -153,6 +162,9 @@
                   translated: {text: self.translatedText, language: self.targetLanguage}
                 }
               ]
+            },
+            function () {
+              self.addedToDictionary = true
             })
         })
       },
@@ -269,5 +281,19 @@
     font-weight: 600;
     padding: 4px;
     outline: rgba(255, 82, 82, 0.4);
+    cursor: pointer;
+  }
+
+  .dictionary-text {
+    min-width: 200px;
+    width: 100%;
+    margin-top: 20px;
+    border: none;
+    background: none;
+    color: #ff5252;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px;
+    text-align: center;
   }
 </style>
