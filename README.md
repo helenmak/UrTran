@@ -1,21 +1,23 @@
-# chrome-translate-app
+#UrTran
 
-> A Vue.js project
+> Chrome extension for translations
 
-## Build Setup
+
+### Run extension
+1) If you haven`t application built ('dist' folder is empty), build application::
 
 ``` bash
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:8080
-npm run dev
-
 # build for production with minification
 npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
 ```
+2) Open Chrome and go to chrome://extensions/
+3) Turn on 'Developer mode' in top right corner of page
+4) Click "Load Unpacked Extension" and select directory with this project
+5) Application must appear on browser`s toolbar. 
+6) Reload some page and try to select some word to see translation.
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+######I recommend to turn off Google Translate extension, when you run UrTran, cause it feels a little uncomfortable to have both running.
+
