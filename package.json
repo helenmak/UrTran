@@ -1,8 +1,8 @@
 {
   "name": "chrome-translate-app",
   "version": "1.0.0",
-  "description": "A Vue.js project",
-  "author": "helenmak <elenamak@ukr.net>",
+  "description": "chrome extension",
+  "author": "unknown",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
