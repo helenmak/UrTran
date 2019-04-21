@@ -1,6 +1,6 @@
 <template>
   <div
-    class="urTranPopup"
+    class="urtran-popup"
     :style="{
         position: 'absolute',
         top: top + 'px',
@@ -9,46 +9,64 @@
     @click.stop
     @selectstart.stop
   >
-    <div>
-      <img v-for="flag in sourceCountriesFlags" :src="flag">
-    </div>
-    <select
-      class="selectLanguage"
-      v-model="sourceLanguage"
-    >
-      <option
-        v-for="language in languages"
-        :value="language.language"
-      >
-        {{language.name}}
-      </option>
-    </select>
 
-    <button @click="addToDictionary">
-      Add to dictionary
-    </button>
+    <div class="source-header">
+      <select
+        class="select-language source"
+        v-model="sourceLanguage"
+      >
+        <option
+          v-for="language in languages"
+          :value="language.language"
+        >
+          {{language.name}}
+        </option>
+      </select>
+
+      <img
+        class="flag"
+        v-for="flag in sourceCountriesFlags"
+        :src="flag"
+      >
+    </div>
 
     <div class="original">
       {{selectionText}}
     </div>
+
     <div class="divider"></div>
-    <div>
-      <img v-for="flag in targetCountriesFlags" :src="flag">
-    </div>
-    <select
-      class="selectLanguage"
-      v-model="targetLanguage"
-    >
-      <option
-        v-for="language in languages"
-        :value="language.language"
-      >
-        {{language.name}}
-      </option>
-    </select>
+
     <div class="translated">
       {{translatedText}}
     </div>
+
+    <div class="target-header">
+      <select
+        class="select-language target"
+        v-model="targetLanguage"
+      >
+        <option
+          v-for="language in languages"
+          :value="language.language"
+        >
+          {{language.name}}
+        </option>
+      </select>
+
+      <img
+        class="flag"
+        v-for="flag in targetCountriesFlags"
+        :src="flag"
+      >
+    </div>
+
+    <button
+      class="dictionary-button"
+      @click="addToDictionary"
+    >
+      Add text to dictionary
+    </button>
+
   </div>
 </template>
 
@@ -97,7 +115,7 @@
         if (translations.detectedSourceLanguage) this.sourceLanguage = translations.detectedSourceLanguage
       },
       async getAvailableLanguages(target) {
-        this.languages = await api.getAvailableLanguages({ target })
+        this.languages = await api.getAvailableLanguages({target})
       },
       log() {
         console.log('clicked')
@@ -116,18 +134,22 @@
                   translated: {text: self.translatedText, language: self.targetLanguage}
                 }
               ]
+            },
+            function () {
+              self.eventBus.$emit('dictionaryChange')
             })
         })
       },
+      getFlagSrc(countryCode) {
+        return `https://www.countryflags.io/${countryCode}/flat/64.png`
+      },
       getSourceCountriesFlag() {
-        const sourceCountries = languagesToCountries[this.sourceLanguage]
-        const getFlagSrc = country => `https://www.countryflags.io/${country}/flat/64.png`
-        this.sourceCountriesFlags = sourceCountries.map(getFlagSrc)
+        const sourceCountries = languagesToCountries[this.sourceLanguage] || []
+        this.sourceCountriesFlags = sourceCountries.map(this.getFlagSrc)
       },
       getTargetCountriesFlag() {
-        const targetCountries = languagesToCountries[this.targetLanguage]
-        const getFlagSrc = country => `https://www.countryflags.io/${country}/flat/64.png`
-        this.targetCountriesFlags = targetCountries.map(getFlagSrc)
+        const targetCountries = languagesToCountries[this.targetLanguage] || []
+        this.targetCountriesFlags = targetCountries.map(this.getFlagSrc)
       }
     },
     created() {
@@ -136,19 +158,20 @@
       this.getAvailableLanguages(this.browserLanguage)
       this.translatedText = this.translations.translatedText
       this.sourceLanguage = this.translations.detectedSourceLanguage
+      this.getTargetCountriesFlag()
       console.log('sourceLanguage', this.sourceLanguage)
     }
   }
 </script>
 
 <style scoped>
-  .urTranPopup {
+  .urtran-popup {
     position: absolute;
     display: flex;
     flex-direction: column;
     border: 1px solid #E0E0E0;
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.35);
-    background-color: #F6F9FF;
+    background-color: #fff;
     padding: 20px 15px;
   }
 
@@ -170,18 +193,57 @@
     width: 100%;
     position: relative;
     margin: 15px 0;
-    height: 1px;
-    background-color: #C3C3C3;
+    border-bottom: 1px dashed #ff5252;
   }
 
-  .selectLanguage {
-    align-self: flex-end;
-    border: 1px solid #E7E9EC;
-    background-color: #F6F9FF;
+  .select-language {
+    background-color: #fff;
     min-width: 200px;
     width: 50%;
-    font-size: 13px;
-    padding: 5px;
-    margin-bottom: 12px;
+    font-size: 14px;
+    padding-left: 8px;
+    height: 28px;
+    border-style: solid;
+    border-width: 1px;
+  }
+
+  .select-language.source {
+    border-color: rgb(255, 82, 82) rgba(255, 82, 82, 0.6) rgba(255, 82, 82, 0.6) rgb(255, 82, 82);
+  }
+
+  .select-language.target {
+    border-color: rgba(255, 82, 82, 0.6) rgba(255, 82, 82, 0.6) rgb(255, 82, 82) rgb(255, 82, 82);
+  }
+
+  .source-header, .target-header {
+    display: flex;
+    height: 32px;
+    align-items: center;
+  }
+
+  .source-header {
+    margin: 0 0 16px;
+  }
+
+  .target-header {
+    margin: 16px 0 0;
+  }
+
+  .flag {
+    height: 100%;
+    margin-left: 20px;
+  }
+
+  .dictionary-button {
+    min-width: 200px;
+    width: 100%;
+    margin-top: 20px;
+    border: none;
+    background: none;
+    color: #ff5252;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px;
+    outline: black;
   }
 </style>

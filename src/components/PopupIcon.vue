@@ -1,19 +1,23 @@
 <template>
     <button
-      class="urTranPopupIcon"
+      class="urtran-icon-wrapper"
       :style="{
         position: 'absolute',
         top: top + 'px',
         left: left + 'px'
       }"
       @click.stop="handlePopupClick"
-    >POPUP
+    >
+      <worlwide-icon class="urtran-icon"/>
     </button>
 </template>
 
 <script>
+  import WorlwideIcon from './WorlwideIcon'
+
   export default {
     name: 'PopupIcon',
+    components: {WorlwideIcon},
     props: {
       top: Number,
       left: Number
@@ -26,21 +30,31 @@
     methods: {
       handlePopupClick() {
         this.$emit('iconClick')
-        console.log('iconClick')
       }
     }
   }
 </script>
 
 <style scoped>
-  .urTranPopupIcon {
+  .urtran-icon-wrapper {
+    height: 28px;
+    width: 28px;
+    padding: 2px;
     position: absolute;
-    background-color: red;
+    background: #EA7A87;
     cursor: pointer;
     border: none;
+    border-radius: 5px;
+    box-sizing: border-box;
   }
 
-  .urTranPopupIcon:focus {
-    outline: 1px auto darkred;
+  .urtran-icon-wrapper:focus {
+    outline: none;
+    box-shadow: rgba(240, 132, 146, 0.68) 0 0 0 2px;
+  }
+
+  .urtran-icon {
+    height: 24px;
+    width: 24px;
   }
 </style>

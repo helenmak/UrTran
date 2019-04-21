@@ -1,7 +1,6 @@
 <template>
   <div>
     <app-settings />
-    <div>{{msg}}</div>
   </div>
 
 </template>
@@ -88,7 +87,7 @@
         const selection = window.getSelection()
         const selectionRange = selection.getRangeAt(0) //get the text range
 
-        this.selectionText = selection.toString()
+        this.selectionText = selection.toString().trim()
         this.selectionRect = selectionRange.getBoundingClientRect()
       },
       showPopup() {
@@ -103,6 +102,7 @@
             translations: this.translations
           }
         }).$mount()
+
         this.renderElement(popupComponent.$el)
       },
       renderElement(el) {
@@ -120,8 +120,8 @@
       async handleDoubleClick(event) {
         console.log('doubleclick', this.trackSelection)
         this.getSelectionProperties()
-        if (this.selectionText) {
-          this.setIconCoordinates(event) // just to know where to render poopup
+        if (this.selectionText.trim()) {
+          this.setIconCoordinates(event) // just to know where to render popup
           await this.translateText()
           this.showPopup()
           this.trackSelection = false
