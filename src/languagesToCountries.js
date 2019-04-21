@@ -23,7 +23,7 @@ export default {
   fa: [ 'ir', 'iq'],
   fi: [ 'fi'],
   fr: [ 'de'],
-  fy: [ 'fy'],
+  fy: [ 'nl', 'de'],
   ga: [ 'ga'],
   gd: [ 'gd'],
   gl: [ 'gl'],
