@@ -1,11 +1,16 @@
 <template>
-  <div class="hello"></div>
+  <div>
+    <app-settings />
+    <div>{{msg}}</div>
+  </div>
+
 </template>
 
 <script>
   import Vue from 'vue';
   import PopupIcon from './PopupIcon';
   import Popup from './Popup';
+  import AppSettings from './AppSettings'
 
   import debounce from 'lodash.debounce';
 
@@ -13,7 +18,7 @@
 
   export default {
     name: 'HelloWorld',
-    components: { PopupIcon, Popup },
+    components: { PopupIcon, Popup, AppSettings },
     data() {
       return {
         msg: 'Welcome to Your Vue.js App',
@@ -136,8 +141,3 @@
     }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>

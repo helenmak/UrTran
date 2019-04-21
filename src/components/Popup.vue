@@ -9,6 +9,9 @@
     @click.stop
     @selectstart.stop
   >
+    <div>
+      <img v-for="flag in sourceCountriesFlags" :src="flag">
+    </div>
     <select
       class="selectLanguage"
       v-model="sourceLanguage"
@@ -21,10 +24,17 @@
       </option>
     </select>
 
+    <button @click="addToDictionary">
+      Add to dictionary
+    </button>
+
     <div class="original">
       {{selectionText}}
     </div>
     <div class="divider"></div>
+    <div>
+      <img v-for="flag in targetCountriesFlags" :src="flag">
+    </div>
     <select
       class="selectLanguage"
       v-model="targetLanguage"
@@ -45,6 +55,8 @@
 <script>
   import api from '../api/'
 
+  import languagesToCountries from '../languagesToCountries'
+
   export default {
     name: 'Popup',
     props: {
@@ -58,14 +70,20 @@
       translatedText: '',
       sourceLanguage: '',
       browserLanguage: 'uk',
-      targetLanguage: 'uk'
+      targetLanguage: 'uk',
+      sourceCountriesFlags: null,
+      targetCountriesFlags: null
     }),
     watch: {
       sourceLanguage(newSource, oldSource) {
-        if (oldSource && newSource) this.translateText()
+        if (oldSource && newSource) {
+          this.translateText()
+        }
+        this.getSourceCountriesFlag()
       },
       targetLanguage() {
         this.translateText()
+        this.getTargetCountriesFlag()
       }
     },
     methods: {
@@ -83,11 +101,38 @@
       },
       log() {
         console.log('clicked')
+      },
+      addToDictionary() {
+        const self = this
+
+        chrome.storage.local.get(['dictionary'], function (result) {
+          const prevDictionary = result.dictionary || []
+
+          chrome.storage.local.set(
+            {
+              dictionary: [...prevDictionary,
+                {
+                  original: {text: self.selectionText, language: self.sourceLanguage},
+                  translated: {text: self.translatedText, language: self.targetLanguage}
+                }
+              ]
+            })
+        })
+      },
+      getSourceCountriesFlag() {
+        const sourceCountries = languagesToCountries[this.sourceLanguage]
+        const getFlagSrc = country => `https://www.countryflags.io/${country}/flat/64.png`
+        this.sourceCountriesFlags = sourceCountries.map(getFlagSrc)
+      },
+      getTargetCountriesFlag() {
+        const targetCountries = languagesToCountries[this.targetLanguage]
+        const getFlagSrc = country => `https://www.countryflags.io/${country}/flat/64.png`
+        this.targetCountriesFlags = targetCountries.map(getFlagSrc)
       }
     },
-    created(){
-      const browserLanguage = navigator.language.slice(0,2)
-      if (browserLanguage) this.browserLanguage = browserLanguage;
+    created() {
+      const browserLanguage = navigator.language.slice(0, 2)
+      if (browserLanguage) this.browserLanguage = browserLanguage
       this.getAvailableLanguages(this.browserLanguage)
       this.translatedText = this.translations.translatedText
       this.sourceLanguage = this.translations.detectedSourceLanguage
@@ -102,7 +147,7 @@
     display: flex;
     flex-direction: column;
     border: 1px solid #E0E0E0;
-    box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35);
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.35);
     background-color: #F6F9FF;
     padding: 20px 15px;
   }
