@@ -17,7 +17,8 @@ npm run build
 3) Turn on 'Developer mode' in top right corner of page
 4) Click "Load Unpacked Extension" and select directory with this project
 5) Application must appear on browser`s toolbar. 
-6) Reload some page and try to select some word to see translation.
+6) Go to page you want to translate. Reload the page in order for extension to work properly. 
+Try to select some word to see translation.
 
 ######I recommend to turn off Google Translate extension, when you run UrTran, cause it feels a little uncomfortable to have both running.
 
