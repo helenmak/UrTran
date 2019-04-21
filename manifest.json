@@ -31,13 +31,7 @@
   "permissions": [
     "activeTab",
     "declarativeContent",
-    "storage",
-    "tabs",
-    "http://*/*",
-    "http://*",
-    "https://*",
-    "https://*/*",
-    "https://translation.googleapis.com"
+    "storage"
   ],
   "manifest_version": 2
 }

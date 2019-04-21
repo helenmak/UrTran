@@ -20,5 +20,7 @@ npm run build
 6) Go to page you want to translate. Reload the page in order for extension to work properly. 
 Try to select some word to see translation.
 
-######I recommend to turn off Google Translate extension, when you run UrTran, cause it feels a little uncomfortable to have both running.
+###### This extension was published to Goggle Chrome Store, but currently it's on moderation. If it pass moderation quickly, you`ll see it in Chrome Store as UrTran. 
+
+###### I recommend to turn off Google Translate extension, when you run UrTran, cause it feels a little uncomfortable to have both running.
 
