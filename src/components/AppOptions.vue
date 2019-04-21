@@ -63,20 +63,33 @@
       dictionaryVisible: false
     }),
     methods: {
+      /**
+       * Fetches dictionary data and renders dictionary elements on page
+       */
       showDictionary() {
         this.dictionaryVisible = true
         this.getDictionary()
       },
+      /**
+       * Gets dictionary from storage and set to component data.
+       */
       getDictionary() {
         const self = this
         chrome.storage.local.get(['dictionary'], function (result) {
           self.dictionary = result.dictionary
         })
       },
+      /**
+       * Removes dictionary data and hides dictionary elements on page
+       */
       hideDictionary() {
         this.dictionaryVisible = false
         this.dictionary = null
       },
+      /**
+       * Removes item from dictionary and component dictionary data
+       * @param {number} index - The index of item to remove.
+       */
       removeDictionaryItem(index) {
         this.dictionary.splice(index, 1)
         const self = this
@@ -84,6 +97,10 @@
       }
     },
     filters: {
+      /**
+       * Converts string to uppercased string
+       * @param {string} value - String to uppercase.
+       */
       uppercase(value) {
         return value ? value.toUpperCase() : ''
       }

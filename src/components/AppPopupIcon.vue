@@ -22,12 +22,10 @@
       top: Number,
       left: Number
     },
-    watch: {
-      top (newVal) {
-        console.log('top change', newVal)
-      }
-    },
     methods: {
+      /**
+       * Emits icon click event to parent component
+       */
       handlePopupClick() {
         this.$emit('iconClick')
       }

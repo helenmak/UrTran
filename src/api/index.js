@@ -1,3 +1,8 @@
+/**
+ * Sends message to background script to call translation api
+ * @param {object} - { text, source, target } - takes text to translate, source language and target language
+ * @returns {Promise}
+ */
 const translateText = async ({ text, source, target = 'uk' }) => {
   try {
     const translated = await new Promise((resolve, reject) => {
@@ -10,20 +15,21 @@ const translateText = async ({ text, source, target = 'uk' }) => {
           options: requestOptions
         },
         response => {
-          if (response.error) {
-            console.log('rejecting')
-            reject(response.error)
-          }
+          if (response.error) reject(response.error)
           else resolve(response.data)
         })
     })
-    console.log('translated.data', translated.data, 'query ', text)
     return translated.data.translations[0]
   } catch (err) {
     console.log('translateText error: ', err)
   }
 }
 
+/**
+ * Sends message to background script to get languages
+ * @param {object} - { target } - takes language to return names of languages
+ * @returns {Promise}
+ */
 const getAvailableLanguages = async ({ target = 'uk' }) => {
   try {
     const availableLanguages = await new Promise((resolve, reject) => {

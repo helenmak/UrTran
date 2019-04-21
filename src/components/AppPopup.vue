@@ -89,24 +89,39 @@
       targetCountriesFlags: null
     }),
     computed: {
+      /**
+       * Computes popupPosition from top/bottom and left props
+       * @returns {object} - object with absolute popup coordinates
+       */
       popupPosition() {
         if (this.top) return { top: `${this.top}px`, left: `${this.left}px` }
         if (this.bottom) return { bottom: `${this.bottom}px`, left: `${this.left}px` }
       }
     },
     watch: {
+      /**
+       * Watches for source language changes and fetch translation and source country flag on change
+       * @param {string} newSource - New selected source language.
+       * @param {string} oldSource - Previous source language
+       */
       sourceLanguage(newSource, oldSource) {
         if (oldSource && newSource) {
           this.translateText()
         }
         this.getSourceCountriesFlag()
       },
+      /**
+       * Watches for target language changes and fetch translation and target country flag on change
+       */
       targetLanguage() {
         this.translateText()
         this.getTargetCountriesFlag()
       }
     },
     methods: {
+      /**
+       * Calls api to translate text. Set translated text and detected source language to component data
+       */
       async translateText() {
         const translations = await api.translateText({
           text: this.selectionText,
@@ -116,9 +131,16 @@
         this.translatedText = translations.translatedText
         if (translations.detectedSourceLanguage) this.sourceLanguage = translations.detectedSourceLanguage
       },
+      /**
+       * Calls api to get available languages. Set languages to component data
+       */
       async getAvailableLanguages(target) {
         this.languages = await api.getAvailableLanguages({target})
       },
+      /**
+       * Adds current source language, original text, target language and translated text to dictionary.
+       * Saves dictionary in storage
+       */
       addToDictionary() {
         const self = this
         chrome.storage.local.get(['dictionary'], function (result) {
@@ -134,13 +156,22 @@
             })
         })
       },
+      /**
+       * Builds src to get flag images
+       */
       getFlagSrc(countryCode) {
         return `https://www.countryflags.io/${countryCode}/flat/64.png`
       },
+      /**
+       * Search for country code for source language and get sources of flag images
+       */
       getSourceCountriesFlag() {
         const sourceCountries = languagesToCountries[this.sourceLanguage] || []
         this.sourceCountriesFlags = sourceCountries.map(this.getFlagSrc)
       },
+      /**
+       * Search for country code for target language and get sources of flag images
+       */
       getTargetCountriesFlag() {
         const targetCountries = languagesToCountries[this.targetLanguage] || []
         this.targetCountriesFlags = targetCountries.map(this.getFlagSrc)

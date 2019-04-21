@@ -23,27 +23,32 @@
         selectionText: '',
         selectionRect: null,
         pagePopupVisible: false,
-        pagePopupIconTop: 0,
-        pagePopupIconLeft: 0,
+        popupTop: 0,
+        popupLeft: 0,
         popupVisible: false,
         trackSelection: false,
         translations: null,
-        doubleClicked: false,
-        windowHeight: 0
+        doubleClicked: false
       }
     },
     methods: {
+      /**
+       * Gets window selection and marks the presence of selection content
+       */
       async setTrackSelection() {
         const selection = window.getSelection()
         const selectionText = selection.toString()
         this.trackSelection = Boolean(selectionText.trim())
       },
+      /**
+       * Handles click event. Gets popup coordinates and show icon if selection present, or removes popup if no selection
+       */
       handleClick(event) {
         const self = this
         const clickTimer = setTimeout(() => { // hack to prevent race with doubleclick event after selection
           if (!self.doubleClicked) {
             if (self.trackSelection) {
-              self.setIconCoordinates(event)
+              self.getPopupCoordinates(event)
               self.showIcon()
               self.trackSelection = false
             } else {
@@ -53,29 +58,42 @@
           }
         }, 250)
       },
-      setIconCoordinates(event) {
-        this.pagePopupIconTop = event.pageY // selectionRect.top + window.scrollY
-        this.pagePopupIconLeft = event.pageX // selectionRect.left + window.scrollX
+      /**
+       * Gets popup coordinates from click event data and sets them component data
+       */
+      getPopupCoordinates(event) {
+        this.popupTop = event.pageY // selectionRect.top + window.scrollY
+        this.popupLeft = event.pageX // selectionRect.left + window.scrollX
       },
+      /**
+       * Creates popup icon element and renders it on page
+       */
       showIcon() {
         const popupIconComponent = new Vue({
           ...AppPopupIcon,
           parent: this,
           propsData: {
-            top: this.pagePopupIconTop,
-            left: this.pagePopupIconLeft
+            top: this.popupTop,
+            left: this.popupLeft
           }
         }).$mount()
         popupIconComponent.$on('iconClick', this.handleIconClick)
         this.renderElement(popupIconComponent.$el)
       },
+      /**
+       * Removes popup from page and clear component data
+       */
       removeElements() {
         this.popupContainer.innerHTML = ''
         this.pagePopupVisible = false
         this.selectionText = ''
-        this.pagePopupIconTop = 0
-        this.pagePopupIconLeft = 0
+        this.selectionText = null
+        this.popupTop = 0
+        this.popupLeft = 0
       },
+      /**
+       * Gets selection text and position properties and sets them to component data
+       */
       getSelectionProperties() {
         const selection = window.getSelection()
         const selectionRange = selection.getRangeAt(0) //get the text range
@@ -83,6 +101,9 @@
         this.selectionText = selection.toString().trim()
         this.selectionRect = selectionRange.getBoundingClientRect()
       },
+      /**
+       * Computes optimal popup placement, creates popup element and renders it on page
+       */
       showPopup() {
         const popupElementsHeight = 215
         const distanceToPopup = 5
@@ -111,7 +132,7 @@
           propsData: {
             top,
             bottom,
-            left: this.pagePopupIconLeft,
+            left: this.popupLeft,
             selectionText: this.selectionText,
             selectionRect: this.selectionRect,
             translations: this.translations
@@ -119,23 +140,36 @@
         }).$mount()
         this.renderElement(popupComponent.$el)
       },
+      /**
+       * Insert elements (icon and popup) on page
+       */
       renderElement(el) {
         this.popupContainer.innerHTML = ''
         this.popupContainer.insertAdjacentElement('afterbegin', el)
       },
+      /**
+       * Calls api to translate text, set translations to component data
+       */
       async translateText() {
         this.translations = await api.translateText({text: this.selectionText, target: 'uk'})
       },
+      /**
+       * Handles popup icon click. Gets selection properties, translates selection and call function to show popup
+       */
       async handleIconClick() {
         this.getSelectionProperties()
         await this.translateText()
         this.showPopup()
       },
+      /**
+       * Handles double click. Gets selection properties, translates selection and call function to show popup.
+       * Remove popup and clears component data if there are no selection.
+       */
       async handleDoubleClick(event) {
         this.doubleClicked = true
         this.getSelectionProperties()
         if (this.selectionText.trim()) {
-          this.setIconCoordinates(event) // just to know where to render popup
+          this.getPopupCoordinates(event) // just to know where to render popup
           await this.translateText()
           this.showPopup()
         } else {
