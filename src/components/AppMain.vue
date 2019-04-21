@@ -92,9 +92,6 @@
         const selectionBottom = window.innerHeight - selectionHeight - this.selectionRect.top
         const canPopupBePlacedInBottom = possiblePopupHeight < selectionBottom
         const canPopupBePlacedInTop = possiblePopupHeight < this.selectionRect.top
-        console.log('top', this.selectionRect.top, 'inner', window.innerHeight)
-        console.log('bottom', this.selectionRect.bottom)
-        console.log('height', possiblePopupHeight)
 
         let top
         let bottom

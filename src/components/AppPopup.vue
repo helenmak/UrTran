@@ -237,6 +237,6 @@
     font-size: 14px;
     font-weight: 600;
     padding: 4px;
-    outline: black;
+    outline: rgba(255, 82, 82, 0.4);
   }
 </style>
