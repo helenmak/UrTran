@@ -88,8 +88,13 @@
         const distanceToPopup = 5
         const selectionHeight = this.selectionRect.height
         const possiblePopupHeight = selectionHeight * 3 + popupElementsHeight
-        const canPopupBePlacedInBottom = possiblePopupHeight < this.selectionRect.bottom
+        // getClientBoundingRect bottom sometimes is incorrect
+        const selectionBottom = window.innerHeight - selectionHeight - this.selectionRect.top
+        const canPopupBePlacedInBottom = possiblePopupHeight < selectionBottom
         const canPopupBePlacedInTop = possiblePopupHeight < this.selectionRect.top
+        console.log('top', this.selectionRect.top, 'inner', window.innerHeight)
+        console.log('bottom', this.selectionRect.bottom)
+        console.log('height', possiblePopupHeight)
 
         let top
         let bottom
@@ -101,7 +106,7 @@
         ) {
           top = this.selectionRect.top + selectionHeight + distanceToPopup + window.scrollY
         } else if (!canPopupBePlacedInBottom) {
-          bottom = this.selectionRect.top + distanceToPopup + window.scrollY
+          bottom = selectionBottom + + selectionHeight + distanceToPopup + window.scrollY
         }
         const popupComponent = new Vue({
           ...AppPopup,
