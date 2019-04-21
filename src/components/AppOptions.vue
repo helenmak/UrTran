@@ -19,8 +19,16 @@
       v-if="dictionaryVisible"
       class="dictionaryWrapper"
     >
+      <div
+        v-if="!dictionary.length"
+        class="no-items"
+      >
+        Oops, no text yet.
+        Add text from popups on page to dictionary and come back:)
+      </div>
 
       <div
+        v-else
         v-for="(item, index) in dictionary"
         class="content"
       >
@@ -152,6 +160,7 @@
     flex-basis: 4%;
     font-size: 16px;
     text-align: center;
+    cursor: pointer;
   }
 
   .language {
@@ -170,5 +179,11 @@
     font-weight: 600;
     padding: 4px;
     outline: rgba(255, 82, 82, 0.4);
+    cursor: pointer;
+  }
+
+  .no-items {
+    color: #787878;
+    font-size: 14px;
   }
 </style>
