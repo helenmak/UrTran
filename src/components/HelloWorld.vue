@@ -1,23 +1,23 @@
 <template>
   <div>
-    <app-settings />
+    <app-settings/>
   </div>
 
 </template>
 
 <script>
-  import Vue from 'vue';
-  import PopupIcon from './PopupIcon';
-  import Popup from './Popup';
+  import Vue from 'vue'
+  import PopupIcon from './PopupIcon'
+  import Popup from './Popup'
   import AppSettings from './AppSettings'
 
-  import debounce from 'lodash.debounce';
+  import debounce from 'lodash.debounce'
 
   import api from '../api/'
 
   export default {
     name: 'HelloWorld',
-    components: { PopupIcon, Popup, AppSettings },
+    components: {PopupIcon, Popup, AppSettings},
     data() {
       return {
         msg: 'Welcome to Your Vue.js App',
@@ -28,7 +28,8 @@
         pagePopupIconLeft: 0,
         popupVisible: false,
         trackSelection: false,
-        translations: null
+        translations: null,
+        doubleClicked: false
       }
     },
     methods: {
@@ -41,20 +42,25 @@
         console.log('selectionText', selectionText.trim(), selectionText.trim().length)
         if (selectionText.trim().length) {
           console.log('set to true')
-          this.trackSelection = true;
-        }
-        else this.trackSelection = false;
+          this.trackSelection = true
+        } else this.trackSelection = false
       },
       handleClick(event) {
-        console.log('click target', event.target)
-        if (this.trackSelection) {
-          this.setIconCoordinates(event)
-          this.showIcon()
-          console.log('set to false')
-          this.trackSelection = false
-        } else {
-          this.removeElements()
-        }
+        const self = this
+        const clickTimer = setTimeout(() => {
+          if (!self.doubleClicked) {
+            console.log('handle click target', event.target)
+            if (self.trackSelection) {
+              self.setIconCoordinates(event)
+              self.showIcon()
+              console.log('set to false')
+              self.trackSelection = false
+            } else {
+              clearTimeout(clickTimer)
+              self.removeElements()
+            }
+          }
+        }, 250)
       },
       setIconCoordinates(event) {
         this.pagePopupIconTop = event.pageY // selectionRect.top + window.scrollY
@@ -77,7 +83,7 @@
         this.removeElements()
       },
       removeElements() {
-        this.popupContainer.innerHTML = '';
+        this.popupContainer.innerHTML = ''
         this.pagePopupVisible = false
         this.selectionText = ''
         this.pagePopupIconTop = 0
@@ -106,7 +112,7 @@
         this.renderElement(popupComponent.$el)
       },
       renderElement(el) {
-        this.popupContainer.innerHTML = '';
+        this.popupContainer.innerHTML = ''
         this.popupContainer.insertAdjacentElement('afterbegin', el)
       },
       async translateText() {
@@ -118,16 +124,18 @@
         this.showPopup()
       },
       async handleDoubleClick(event) {
+        this.doubleClicked = true
         console.log('doubleclick', this.trackSelection)
         this.getSelectionProperties()
         if (this.selectionText.trim()) {
           this.setIconCoordinates(event) // just to know where to render popup
           await this.translateText()
           this.showPopup()
-          this.trackSelection = false
         } else {
           this.removeElements()
         }
+        const self = this
+        setTimeout(() => self.doubleClicked = false, 500) // hack to prevent race with click event after selection
       }
     },
     created() {
