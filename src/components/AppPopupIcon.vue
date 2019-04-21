@@ -8,15 +8,15 @@
       }"
       @click.stop="handlePopupClick"
     >
-      <worlwide-icon class="urtran-icon"/>
+      <worlwide-icon class="urtran-icon" />
     </button>
 </template>
 
 <script>
-  import WorlwideIcon from './WorlwideIcon'
+  import WorlwideIcon from '../shared/WorlwideIcon'
 
   export default {
-    name: 'PopupIcon',
+    name: 'AppPopupIcon',
     components: {WorlwideIcon},
     props: {
       top: Number,

@@ -1,15 +1,15 @@
 <template>
   <div>
-    <app-settings/>
+    <app-options/>
   </div>
 
 </template>
 
 <script>
   import Vue from 'vue'
-  import PopupIcon from './PopupIcon'
-  import Popup from './Popup'
-  import AppSettings from './AppSettings'
+  import AppPopupIcon from './AppPopupIcon'
+  import AppPopup from './AppPopup'
+  import AppOptions from './AppOptions'
 
   import debounce from 'lodash.debounce'
 
@@ -17,10 +17,9 @@
 
   export default {
     name: 'HelloWorld',
-    components: {PopupIcon, Popup, AppSettings},
+    components: {AppPopupIcon, AppPopup, AppOptions},
     data() {
       return {
-        msg: 'Welcome to Your Vue.js App',
         selectionText: '',
         selectionRect: null,
         pagePopupVisible: false,
@@ -29,31 +28,23 @@
         popupVisible: false,
         trackSelection: false,
         translations: null,
-        doubleClicked: false
+        doubleClicked: false,
+        windowHeight: 0
       }
     },
     methods: {
-      log() {
-        console.log('log click')
-      },
-      async handleSelectionChange() {
+      async setTrackSelection() {
         const selection = window.getSelection()
         const selectionText = selection.toString()
-        console.log('selectionText', selectionText.trim(), selectionText.trim().length)
-        if (selectionText.trim().length) {
-          console.log('set to true')
-          this.trackSelection = true
-        } else this.trackSelection = false
+        this.trackSelection = Boolean(selectionText.trim())
       },
       handleClick(event) {
         const self = this
-        const clickTimer = setTimeout(() => {
+        const clickTimer = setTimeout(() => { // hack to prevent race with doubleclick event after selection
           if (!self.doubleClicked) {
-            console.log('handle click target', event.target)
             if (self.trackSelection) {
               self.setIconCoordinates(event)
               self.showIcon()
-              console.log('set to false')
               self.trackSelection = false
             } else {
               clearTimeout(clickTimer)
@@ -64,11 +55,11 @@
       },
       setIconCoordinates(event) {
         this.pagePopupIconTop = event.pageY // selectionRect.top + window.scrollY
-        this.pagePopupIconLeft = event.pageX// selectionRect.left + window.scrollX
+        this.pagePopupIconLeft = event.pageX // selectionRect.left + window.scrollX
       },
       showIcon() {
         const popupIconComponent = new Vue({
-          ...PopupIcon,
+          ...AppPopupIcon,
           parent: this,
           propsData: {
             top: this.pagePopupIconTop,
@@ -76,11 +67,7 @@
           }
         }).$mount()
         popupIconComponent.$on('iconClick', this.handleIconClick)
-
         this.renderElement(popupIconComponent.$el)
-      },
-      handleSelectStart() {
-        this.removeElements()
       },
       removeElements() {
         this.popupContainer.innerHTML = ''
@@ -97,18 +84,37 @@
         this.selectionRect = selectionRange.getBoundingClientRect()
       },
       showPopup() {
+        const popupElementsHeight = 215
+        const distanceToPopup = 5
+        const selectionHeight = this.selectionRect.height
+        const possiblePopupHeight = selectionHeight * 3 + popupElementsHeight
+        const canPopupBePlacedInBottom = possiblePopupHeight < this.selectionRect.bottom
+        const canPopupBePlacedInTop = possiblePopupHeight < this.selectionRect.top
+
+        let top
+        let bottom
+
+        if (
+          canPopupBePlacedInBottom && canPopupBePlacedInTop ||
+          !canPopupBePlacedInBottom && !canPopupBePlacedInTop ||
+          !canPopupBePlacedInTop
+        ) {
+          top = this.selectionRect.top + selectionHeight + distanceToPopup + window.scrollY
+        } else if (!canPopupBePlacedInBottom) {
+          bottom = this.selectionRect.top + distanceToPopup + window.scrollY
+        }
         const popupComponent = new Vue({
-          ...Popup,
+          ...AppPopup,
           parent: this,
           propsData: {
-            top: this.pagePopupIconTop + 32,
+            top,
+            bottom,
             left: this.pagePopupIconLeft,
             selectionText: this.selectionText,
             selectionRect: this.selectionRect,
             translations: this.translations
           }
         }).$mount()
-
         this.renderElement(popupComponent.$el)
       },
       renderElement(el) {
@@ -125,7 +131,6 @@
       },
       async handleDoubleClick(event) {
         this.doubleClicked = true
-        console.log('doubleclick', this.trackSelection)
         this.getSelectionProperties()
         if (this.selectionText.trim()) {
           this.setIconCoordinates(event) // just to know where to render popup
@@ -139,11 +144,11 @@
       }
     },
     created() {
-      const divEl = document.createElement('div')
-      divEl.id = 'urTran'
-      this.popupContainer = document.body.appendChild(divEl)
-      document.addEventListener('selectionchange', debounce(this.handleSelectionChange))
-      document.addEventListener('selectstart', this.handleSelectStart)
+      const popupElement = document.createElement('div')
+      popupElement.id = 'urTran'
+      this.popupContainer = document.body.appendChild(popupElement)
+      document.addEventListener('selectionchange', debounce(this.setTrackSelection))
+      document.addEventListener('selectstart', this.removeElements)
       document.addEventListener('click', this.handleClick)
       document.addEventListener('dblclick', this.handleDoubleClick)
     }

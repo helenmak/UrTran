@@ -1,11 +1,7 @@
 <template>
   <div
     class="urtran-popup"
-    :style="{
-        position: 'absolute',
-        top: top + 'px',
-        left: left + 'px'
-      }"
+    :style="popupPosition"
     @click.stop
     @selectstart.stop
   >
@@ -72,13 +68,13 @@
 
 <script>
   import api from '../api/'
-
   import languagesToCountries from '../languagesToCountries'
 
   export default {
-    name: 'Popup',
+    name: 'AppPopup',
     props: {
       top: Number,
+      bottom: Number,
       left: Number,
       selectionText: String,
       translations: Object
@@ -92,6 +88,12 @@
       sourceCountriesFlags: null,
       targetCountriesFlags: null
     }),
+    computed: {
+      popupPosition() {
+        if (this.top) return { top: `${this.top}px`, left: `${this.left}px` }
+        if (this.bottom) return { bottom: `${this.bottom}px`, left: `${this.left}px` }
+      }
+    },
     watch: {
       sourceLanguage(newSource, oldSource) {
         if (oldSource && newSource) {
@@ -117,15 +119,10 @@
       async getAvailableLanguages(target) {
         this.languages = await api.getAvailableLanguages({target})
       },
-      log() {
-        console.log('clicked')
-      },
       addToDictionary() {
         const self = this
-
         chrome.storage.local.get(['dictionary'], function (result) {
           const prevDictionary = result.dictionary || []
-
           chrome.storage.local.set(
             {
               dictionary: [...prevDictionary,
@@ -134,9 +131,6 @@
                   translated: {text: self.translatedText, language: self.targetLanguage}
                 }
               ]
-            },
-            function () {
-              self.eventBus.$emit('dictionaryChange')
             })
         })
       },
@@ -154,12 +148,10 @@
     },
     created() {
       const browserLanguage = navigator.language.slice(0, 2)
-      if (browserLanguage) this.browserLanguage = browserLanguage
-      this.getAvailableLanguages(this.browserLanguage)
+      this.getAvailableLanguages(browserLanguage)
       this.translatedText = this.translations.translatedText
       this.sourceLanguage = this.translations.detectedSourceLanguage
       this.getTargetCountriesFlag()
-      console.log('sourceLanguage', this.sourceLanguage)
     }
   }
 </script>
@@ -173,6 +165,7 @@
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.35);
     background-color: #fff;
     padding: 20px 15px;
+    max-width: 500px;
   }
 
   .original {

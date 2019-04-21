@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <HelloWorld/>
+    <app-main />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+import AppMain from './components/AppMain'
 
 export default {
   name: 'App',
-  components: { HelloWorld }
+  components: { AppMain }
 }
 </script>
 
@@ -19,7 +19,6 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    margin-top: 60px;
   }
 
   * {

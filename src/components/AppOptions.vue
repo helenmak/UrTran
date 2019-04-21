@@ -45,7 +45,7 @@
 </template>
 
 <script>
-  import RemoveIcon from './RemoveIcon'
+  import RemoveIcon from '../shared/RemoveIcon'
 
   export default {
     name: 'AppSettings',
@@ -60,13 +60,10 @@
         this.getDictionary()
       },
       getDictionary() {
-        console.log('dictionaryChange')
         const self = this
-        if (this.dictionaryVisible) {
-          chrome.storage.local.get(['dictionary'], function (result) {
-            self.dictionary = result.dictionary
-          })
-        }
+        chrome.storage.local.get(['dictionary'], function (result) {
+          self.dictionary = result.dictionary
+        })
       },
       removeDictionaryItem(index) {
         this.dictionary.splice(index, 1);
@@ -78,9 +75,6 @@
       uppercase(value) {
         return value ? value.toUpperCase() : ''
       }
-    },
-    mounted() {
-      this.eventBus.$on('dictionaryChange', this.getDictionary)
     }
   }
 </script>
