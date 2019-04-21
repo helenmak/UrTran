@@ -6,7 +6,7 @@
     "scripts": ["src/background.js"],
     "persistent": false
   },
-  "page_action": {
+  "browser_action": {
     "default_popup": "dist/index.html",
     "default_icon": {
       "16": "src/assets/get_started16.png",
@@ -34,6 +34,8 @@
     "storage",
     "tabs",
     "http://*/*",
+    "http://*",
+    "https://*",
     "https://*/*",
     "https://translation.googleapis.com"
   ],
