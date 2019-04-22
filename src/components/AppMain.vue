@@ -16,7 +16,7 @@
   import api from '../api/'
 
   export default {
-    name: 'HelloWorld',
+    name: 'AppMain',
     components: {AppPopupIcon, AppPopup, AppOptions},
     data() {
       return {
@@ -105,17 +105,18 @@
        * Computes optimal popup placement, creates popup element and renders it on page
        */
       showPopup() {
+        const left = this.selectionRect.left + this.selectionRect.width / 2
         const popupElementsHeight = 215
-        const distanceToPopup = 5
+        const distanceToPopup = 10
         const selectionHeight = this.selectionRect.height
         const possiblePopupHeight = selectionHeight * 3 + popupElementsHeight
-        // getClientBoundingRect bottom sometimes is incorrect
+        // getClientBoundingRect sometimes returns incorrect bottom value
         const selectionBottom = window.innerHeight - selectionHeight - this.selectionRect.top
         const canPopupBePlacedInBottom = possiblePopupHeight < selectionBottom
         const canPopupBePlacedInTop = possiblePopupHeight < this.selectionRect.top
 
         let top
-        let bottom
+        let placement
 
         if (
           canPopupBePlacedInBottom && canPopupBePlacedInTop ||
@@ -123,18 +124,19 @@
           !canPopupBePlacedInTop
         ) {
           top = this.selectionRect.top + selectionHeight + distanceToPopup + window.scrollY
+          placement = 'bottom'
         } else if (!canPopupBePlacedInBottom) {
-          bottom = selectionBottom + + selectionHeight + distanceToPopup + window.scrollY
+          top = this.selectionRect.top + window.scrollY - distanceToPopup
+          placement = 'top'
         }
         const popupComponent = new Vue({
           ...AppPopup,
           parent: this,
           propsData: {
             top,
-            bottom,
-            left: this.popupLeft,
+            placement,
+            left,
             selectionText: this.selectionText,
-            selectionRect: this.selectionRect,
             translations: this.translations
           }
         }).$mount()
@@ -169,7 +171,7 @@
         this.doubleClicked = true
         this.getSelectionProperties()
         if (this.selectionText.trim()) {
-          this.getPopupCoordinates(event) // just to know where to render popup
+          this.getPopupCoordinates(event)
           await this.translateText()
           this.showPopup()
         } else {

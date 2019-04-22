@@ -1,14 +1,17 @@
 <template>
   <div
     class="urtran-popup"
+    :class="popupClass"
     :style="popupPosition"
     @click.stop
     @selectstart.stop
   >
 
-    <div class="source-header">
+    <div class="urtran-arrow" :class="arrowClass"></div>
+
+    <div class="urtran-source-header">
       <select
-        class="select-language source"
+        class="urtran-select-language source"
         v-model="sourceLanguage"
       >
         <option
@@ -20,25 +23,25 @@
       </select>
 
       <img
-        class="flag"
+        class="urtran-flag"
         v-for="flag in sourceCountriesFlags"
         :src="flag"
       >
     </div>
 
-    <div class="original">
+    <div class="urtran-original">
       {{selectionText}}
     </div>
 
-    <div class="divider"></div>
+    <div class="urtran-divider"></div>
 
-    <div class="translated">
+    <div class="urtran-translated">
       {{translatedText}}
     </div>
 
-    <div class="target-header">
+    <div class="urtran-target-header">
       <select
-        class="select-language target"
+        class="urtran-select-language target"
         v-model="targetLanguage"
       >
         <option
@@ -50,7 +53,7 @@
       </select>
 
       <img
-        class="flag"
+        class="urtran-flag"
         v-for="flag in targetCountriesFlags"
         :src="flag"
       >
@@ -58,7 +61,7 @@
 
     <button
       v-if="!addedToDictionary"
-      class="dictionary-button"
+      class="urtran-dictionary-button"
       @click="addToDictionary"
     >
       Add text to dictionary
@@ -66,7 +69,7 @@
 
     <div
       v-else
-      class="dictionary-text"
+      class="urtran-dictionary-text"
     >
       Text added to dictionary!
     </div>
@@ -82,10 +85,10 @@
     name: 'AppPopup',
     props: {
       top: Number,
-      bottom: Number,
       left: Number,
       selectionText: String,
-      translations: Object
+      translations: Object,
+      placement: String
     },
     data: () => ({
       languages: [],
@@ -103,8 +106,21 @@
        * @returns {object} - object with absolute popup coordinates
        */
       popupPosition() {
-        if (this.top) return {top: `${this.top}px`, left: `${this.left}px`}
-        if (this.bottom) return {bottom: `${this.bottom}px`, left: `${this.left}px`}
+        return {top: `${this.top}px`, left: `${this.left}px`}
+      },
+      /**
+       * Computes popup class based on 'placement' props
+       * @returns {string} - class to add in popup styles
+       */
+      popupClass() {
+        return this.placement
+      },
+      /**
+       * Computes popup arrow class based on placement props
+       * @returns {string} - class to add in arrow styles
+       */
+      arrowClass() {
+        return this.placement === 'top' ? 'bottom' : 'top'
       }
     },
     watch: {
@@ -114,9 +130,7 @@
        * @param {string} oldSource - Previous source language
        */
       sourceLanguage(newSource, oldSource) {
-        if (oldSource && newSource) {
-          this.translateText()
-        }
+        if (oldSource && newSource) this.translateText()
         this.getSourceCountriesFlag()
       },
       /**
@@ -205,36 +219,97 @@
     display: flex;
     flex-direction: column;
     border: 1px solid #E0E0E0;
-    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.35);
     background-color: #fff;
     padding: 20px 15px;
     max-width: 500px;
+    transform: translateX(-50%);
+    z-index: 1001;
   }
 
-  .original {
+  .urtran-popup.top {
+    transform: translateX(-50%) translateY(-100%);
+  }
+
+  /*.urtran-popup::before {*/
+    /*content: '';*/
+    /*position: absolute;*/
+    /*top: -8px;*/
+    /*left: 50%;*/
+    /*width: 13px;*/
+    /*height: 13px;*/
+    /*z-index: 1;*/
+    /*background-color: #fff;*/
+    /*transform: translateX(-50%) rotate(45deg);*/
+    /*border-top: 1px solid #E0E0E0;*/
+    /*border-left: 1px solid #E0E0E0;*/
+    /*box-shadow: -1px -1px 2px 0 rgba(0, 0, 0, 0.25);*/
+  /*}*/
+
+  /*.urtran-popup::after {*/
+    /*content: '';*/
+    /*position: absolute;*/
+    /*top: -8px;*/
+    /*left: 50%;*/
+    /*width: 13px;*/
+    /*height: 13px;*/
+    /*z-index: 1;*/
+    /*background-color: #fff;*/
+    /*transform: translateX(-50%) rotate(45deg);*/
+    /*border-top: 1px solid #E0E0E0;*/
+    /*border-left: 1px solid #E0E0E0;*/
+    /*box-shadow: -1px -1px 2px 0 rgba(0, 0, 0, 0.25);*/
+  /*}*/
+
+  .urtran-arrow {
+    position: absolute;
+    left: 50%;
+    width: 13px;
+    height: 13px;
+    z-index: 1;
+    background-color: #fff;
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .urtran-arrow.top {
+    top: -7px;
+    border-top: 1px solid #E0E0E0;
+    border-left: 1px solid #E0E0E0;
+    box-shadow: -1px -1px 2px 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .urtran-arrow.bottom {
+    bottom: -7px;
+    transform: translateX(-50%) rotate(45deg);
+    border-bottom: 1px solid #E0E0E0;
+    border-right: 1px solid #E0E0E0;
+    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .urtran-original {
     font-family: 'Roboto', Helvetica, Arial, sans-serif;
     font-size: 16px;
     font-weight: 500;
     color: #252525;
   }
 
-  .translated {
+  .urtran-translated {
     font-family: 'Roboto', Helvetica, Arial, sans-serif;
     font-size: 16px;
     font-weight: 500;
     color: #252525;
   }
 
-  .divider {
+  .urtran-divider {
     width: 100%;
     position: relative;
     margin: 15px 0;
     border-bottom: 1px dashed #ff5252;
   }
 
-  .select-language {
+  .urtran-select-language {
     background-color: #fff;
-    min-width: 200px;
+    min-width: 150px;
     width: 50%;
     font-size: 14px;
     padding-left: 8px;
@@ -243,34 +318,34 @@
     border-width: 1px;
   }
 
-  .select-language.source {
+  .urtran-select-language.source {
     border-color: rgb(255, 82, 82) rgba(255, 82, 82, 0.6) rgba(255, 82, 82, 0.6) rgb(255, 82, 82);
   }
 
-  .select-language.target {
+  .urtran-select-language.target {
     border-color: rgba(255, 82, 82, 0.6) rgba(255, 82, 82, 0.6) rgb(255, 82, 82) rgb(255, 82, 82);
   }
 
-  .source-header, .target-header {
+  .urtran-source-header, .urtran-target-header {
     display: flex;
     height: 32px;
     align-items: center;
   }
 
-  .source-header {
+  .urtran-source-header {
     margin: 0 0 16px;
   }
 
-  .target-header {
+  .urtran-target-header {
     margin: 16px 0 0;
   }
 
-  .flag {
+  .urtran-flag {
     height: 100%;
     margin-left: 20px;
   }
 
-  .dictionary-button {
+  .urtran-dictionary-button {
     min-width: 200px;
     width: 100%;
     margin-top: 20px;
@@ -282,9 +357,10 @@
     padding: 4px;
     outline: rgba(255, 82, 82, 0.4);
     cursor: pointer;
+    box-shadow: none;
   }
 
-  .dictionary-text {
+  .urtran-dictionary-text {
     min-width: 200px;
     width: 100%;
     margin-top: 20px;

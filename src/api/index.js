@@ -1,7 +1,7 @@
 /**
  * Sends message to background script to call translation api
  * @param {object} - { text, source, target } - takes text to translate, source language and target language
- * @returns {Promise}
+ * @returns {Promise} - Promise object represents translations data
  */
 const translateText = async ({ text, source, target = 'uk' }) => {
   try {
@@ -28,7 +28,7 @@ const translateText = async ({ text, source, target = 'uk' }) => {
 /**
  * Sends message to background script to get languages
  * @param {object} - { target } - takes language to return names of languages
- * @returns {Promise}
+ * @returns {Promise} - Promise object represents list of available languages
  */
 const getAvailableLanguages = async ({ target = 'uk' }) => {
   try {

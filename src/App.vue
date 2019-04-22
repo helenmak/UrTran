@@ -23,5 +23,12 @@ export default {
 
   * {
     font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0;
+    margin: 0;
+    text-shadow: none;
+    box-shadow: none;
+    border: none;
   }
 </style>
