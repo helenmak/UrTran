@@ -161,13 +161,14 @@
         this.languages = await api.getAvailableLanguages({target})
       },
       /**
-       * Adds current source language, original text, target language and translated text to dictionary.
+       * Adds current source and target languages, original and translated texts to dictionary.
        * Saves dictionary in storage
        */
       addToDictionary() {
         const self = this
         chrome.storage.local.get(['dictionary'], function (result) {
           const prevDictionary = result.dictionary || []
+
           chrome.storage.local.set(
             {
               dictionary: [...prevDictionary,
@@ -180,6 +181,7 @@
             function () {
               self.addedToDictionary = true
             })
+
         })
       },
       /**
@@ -230,36 +232,6 @@
   .urtran-popup.top {
     transform: translateX(-50%) translateY(-100%);
   }
-
-  /*.urtran-popup::before {*/
-    /*content: '';*/
-    /*position: absolute;*/
-    /*top: -8px;*/
-    /*left: 50%;*/
-    /*width: 13px;*/
-    /*height: 13px;*/
-    /*z-index: 1;*/
-    /*background-color: #fff;*/
-    /*transform: translateX(-50%) rotate(45deg);*/
-    /*border-top: 1px solid #E0E0E0;*/
-    /*border-left: 1px solid #E0E0E0;*/
-    /*box-shadow: -1px -1px 2px 0 rgba(0, 0, 0, 0.25);*/
-  /*}*/
-
-  /*.urtran-popup::after {*/
-    /*content: '';*/
-    /*position: absolute;*/
-    /*top: -8px;*/
-    /*left: 50%;*/
-    /*width: 13px;*/
-    /*height: 13px;*/
-    /*z-index: 1;*/
-    /*background-color: #fff;*/
-    /*transform: translateX(-50%) rotate(45deg);*/
-    /*border-top: 1px solid #E0E0E0;*/
-    /*border-left: 1px solid #E0E0E0;*/
-    /*box-shadow: -1px -1px 2px 0 rgba(0, 0, 0, 0.25);*/
-  /*}*/
 
   .urtran-arrow {
     position: absolute;
