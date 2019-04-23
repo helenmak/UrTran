@@ -444,13 +444,13 @@
 
   .urtran-main-button {
     min-width: 150px;
-    width: 100%;
-    border: rgba(255, 82, 82, 0.4);
+    border: 1px solid rgba(255,82,82,.4);
     background: none;
     color: #ff5252;
     font-size: 16px;
     font-weight: 600;
     padding: 4px;
+    margin: 8px;
     outline: rgba(255, 82, 82, 0.4);
     cursor: pointer;
   }
