@@ -137,7 +137,9 @@
             <span class="urtran-language">
               [ {{item.original.language | uppercase}} ]
             </span>
+              <span class="urtran-text">
               {{item.original.text}}
+              </span>
             </div>
 
             <div
@@ -147,7 +149,9 @@
           <span class="urtran-language">
             [ {{item.translated.language | uppercase}} ]
           </span>
-              {{item.translated.text}}
+              <span class="urtran-text">
+                {{item.translated.text}}
+              </span>
             </div>
           </div>
 
@@ -216,7 +220,7 @@
     },
     methods: {
       /**
-       * Fetches dictionary data and renders dictionary elements on page
+       * Fetches dictionary data and renders dictionary elements on page. Hides learning cards area.
        */
       showDictionary() {
         this.hideLearningCards()
@@ -239,6 +243,12 @@
         this.isDictionaryVisible = false
         this.dictionary = null
       },
+      /**
+       * Add original-translated pair of texts to storage learning list.
+       * Marks corresponding item in dictionary as learning
+       * @param {object} item - item to add to list
+       * @param {number} index - item index in list
+       */
       addToLearning(item, index) {
         this.markDictionaryItemLearned(index)
 
@@ -250,6 +260,10 @@
 
         })
       },
+      /**
+       * Marks dictionary item as learning
+       * @param {number} index - item index in list
+       */
       markDictionaryItemLearned(index) {
         const self = this
         chrome.storage.local.get(['dictionary'], function (result) {
@@ -271,11 +285,18 @@
         this.dictionary.splice(index, 1)
         chrome.storage.local.set({dictionary: self.dictionary})
       },
+      /**
+       * Fetches learning cards and renders them on page. Hides dictionary area.
+       */
       showLearningCards() {
         this.hideDictionary()
         this.isLearningCardsVisible = true
         this.getLearningCards()
       },
+      /**
+       * Gets learning items from storage and set to component data.
+       * Also set corresponding initial cards visibility component data to false.
+       */
       getLearningCards() {
         const self = this
         chrome.storage.local.get(['learning'], function (result) {
@@ -285,21 +306,41 @@
           self.visibleLearningCards = [ ...Array.from(Array(learningLength), () => false) ]
         })
       },
+      /**
+       * Removes learning data and hides learning cards from page
+       */
       hideLearningCards() {
         this.isLearningCardsVisible = false
         this.learning = null
         this.visibleLearningCards = []
         this.learningMode = ''
       },
+      /**
+       * Sets learning cards mode
+       * @param {string} mode - determines show original or translated card
+       */
       setLearningMode(mode) {
         this.learningMode = mode
       },
+      /**
+       * Shows hidden card. Sets card visibility data to true
+       * @param {number} index - index of current learning cards
+       */
       showHiddenLearningCard(index) {
         this.$set(this.visibleLearningCards, index, true)
       },
+      /**
+       * Hides previously opened learning card. Sets card visibility data to false
+       * @param {number} index - index of current learning cards
+       */
       hideLearningCard(index) {
         this.$set(this.visibleLearningCards, index, false)
       },
+      /**
+       * Marks learning card as learned.
+       * Removes card if item was learned 3 times.
+       * @param {number} index - index of cards to mark as learned
+       */
       markAsLearned(index) {
         const self = this
         chrome.storage.local.get(['learning'], function (result) {
@@ -307,7 +348,6 @@
           const timesLearnt = learning[index].timesLearnt
 
           if (timesLearnt === 2) {
-            console.log(timesLearnt, 'timesLearnt')
             self.removeLearningItem(index)
           } else {
             learning[index].timesLearnt = timesLearnt ? timesLearnt + 1 : 1
@@ -319,15 +359,27 @@
           }
         })
       },
+      /**
+       * Removes an original-translated pair of learning cards from storage and component data.
+       * @param {number} index - index of cards to remove
+       */
       removeLearningItem(index) {
         const self = this
         this.visibleLearningCards.splice(index, 1)
         this.learning.splice(index, 1)
         chrome.storage.local.set({learning: self.learning})
       },
+      /**
+       * Computes original learning card class based on learning mode and visibility
+       * @param {number} index - index of card
+       */
       getOriginalLearningClass(index) {
         return (this.learningMode === 'original' || this.visibleLearningCards[index]) ? 'visible' : 'hidden'
       },
+      /**
+       * Computes translated learning card class based on learning mode and visibility
+       * @param {number} index - index of card
+       */
       getTranslatedLearningClass(index) {
         return (this.learningMode === 'translated' || this.visibleLearningCards[index]) ? 'visible' : 'hidden'
       },
@@ -340,9 +392,6 @@
       uppercase(value) {
         return value ? value.toUpperCase() : ''
       }
-    },
-    updated() {
-      console.log('updates')
     }
   }
 </script>
@@ -461,8 +510,12 @@
     margin-top: 5px;
   }
 
-  .hidden {
+  .hidden .urtran-text {
     visibility: hidden;
+  }
+
+  .hidden .urtran-language {
+    opacity: 0.8;
   }
 
   .choose-mode-button {
