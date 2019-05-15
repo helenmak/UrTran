@@ -1,4 +1,4 @@
-#UrTran
+## UrTran
 
 > [Chrome extension for translations](https://chrome.google.com/webstore/detail/urtran/jbpeflkanafekaohanpplmddldaboklj)
 
