@@ -1,7 +1,6 @@
 #UrTran
 
-> Chrome extension for translations
-
+> [Chrome extension for translations](https://chrome.google.com/webstore/detail/urtran/jbpeflkanafekaohanpplmddldaboklj)
 
 ### Run extension
 If you haven`t application built ('dist' folder is empty), build application::
@@ -22,8 +21,3 @@ npm run build
 7) Try to select some word to see translation.
 
 When learning cards on main extension popup, you have to press 3 times 'Mark as learned' in order for card to be removed.
-
-###### This extension was published to Goggle Chrome Store, but currently it's on moderation. If it pass moderation quickly, you`ll see it in Chrome Store as UrTran. 
-
-###### I recommend to turn off Google Translate extension, when you run UrTran, cause it feels a little uncomfortable to have both running.
-
