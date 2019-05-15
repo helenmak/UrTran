@@ -1,5 +1,5 @@
 const apiv2 = 'https://translation.googleapis.com'
-const key = 'AIzaSyD9vAcdqFJ3PY2pKqsL_gqZgZfFHR7Ff68'
+const key = 'ENTER_GOOGLE_API_KEY_HERE'
 
 /**
  * Listen to events from content script and send api calls to google translation api
