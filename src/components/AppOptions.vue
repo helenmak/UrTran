@@ -402,6 +402,7 @@
     flex-direction: column;
     width: 500px;
     padding: 8px;
+    background-color: #343753;
   }
 
   .urtran-dictionary-wrapper {
@@ -409,7 +410,7 @@
     flex-direction: column;
     width: 100%;
     margin-top: 10px;
-    border-top: 1px solid #c0bebe;
+    border-top: 1px dashed rgba(242, 242, 242, 0.86);
   }
 
   .urtran-learning-wrapper {
@@ -417,7 +418,7 @@
     flex-direction: column;
     width: 100%;
     margin-top: 10px;
-    border-top: 1px solid #c0bebe;
+    border-top: 1px dashed rgba(242, 242, 242, 0.86);
   }
 
   .urtran-dictionary-content {
@@ -440,6 +441,7 @@
     line-height: 1.3;
     text-align: left;
     overflow-wrap: break-word;
+    color: #f2f2f2db;
   }
 
   .urtran-dictionary-item {
@@ -448,6 +450,7 @@
     line-height: 1.3;
     text-align: left;
     overflow-wrap: break-word;
+    color: #f2f2f2db;
   }
 
   .urtran-dictionary-item.original {
@@ -487,45 +490,52 @@
 
   .urtran-language {
     margin: 0 9px;
-    color: #ff5252;
+    color: #e0d1ce;
     display: inline-block;
   }
 
   .urtran-main-button {
     min-width: 150px;
-    border: 1px solid rgba(255,82,82,.4);
+    border: 1px solid #e0d1ce;
     background: none;
-    color: #ff5252;
+    color: #f2f2f2db;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     padding: 4px;
     margin: 8px;
-    outline: rgba(255, 82, 82, 0.4);
+    outline: #e0d1ce;
     cursor: pointer;
   }
 
   .urtran-no-items {
-    color: #787878;
+    color: #a3a2a2;
     font-size: 14px;
     margin-top: 5px;
   }
 
   .hidden .urtran-text {
     visibility: hidden;
+    color: #f2f2f2db;
   }
 
   .hidden .urtran-language {
     opacity: 0.8;
   }
+  
+  .choose-mode-wrapper {
+    color: #f2f2f2db;
+    font-size: 14px;
+    font-weight: 500;
+  }
 
   .choose-mode-button {
-    border: rgba(255, 82, 82, 0.4);
+    border: #e0d1ce;
     background: none;
-    color: #ff5252;
+    color: #e0d1ce;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     padding: 4px;
-    outline: rgba(255, 82, 82, 0.4);
+    outline: #e0d1ce;
     cursor: pointer;
   }
 
@@ -545,13 +555,13 @@
   .urtran-learning-action {
     display: flex;
     align-items: center;
-    border: rgba(255,82,82,.4);
+    border: #e0d1ce;
     background: none;
-    color: #ff5252;
+    color: #e0d1ce;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     padding: 4px;
-    outline: rgba(255,82,82,.4);
+    outline: #e0d1ce;
     cursor: pointer;
   }
 

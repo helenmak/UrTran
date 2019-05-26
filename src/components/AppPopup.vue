@@ -220,9 +220,9 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    border: 1px solid #E0E0E0;
+    border: 1px solid #343753;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.35);
-    background-color: #fff;
+    background-color: #343753;
     padding: 20px 15px;
     max-width: 500px;
     transform: translateX(-50%);
@@ -239,22 +239,22 @@
     width: 13px;
     height: 13px;
     z-index: 1;
-    background-color: #fff;
+    background-color: #343753;
     transform: translateX(-50%) rotate(45deg);
   }
 
   .urtran-arrow.top {
     top: -7px;
-    border-top: 1px solid #E0E0E0;
-    border-left: 1px solid #E0E0E0;
+    border-top: 1px solid #343753;
+    border-left: 1px solid #343753;
     box-shadow: -1px -1px 2px 0 rgba(0, 0, 0, 0.25);
   }
 
   .urtran-arrow.bottom {
     bottom: -7px;
     transform: translateX(-50%) rotate(45deg);
-    border-bottom: 1px solid #E0E0E0;
-    border-right: 1px solid #E0E0E0;
+    border-bottom: 1px solid #343753;
+    border-right: 1px solid #343753;
     box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.25);
   }
 
@@ -262,21 +262,21 @@
     font-family: 'Roboto', Helvetica, Arial, sans-serif;
     font-size: 16px;
     font-weight: 500;
-    color: #252525;
+    color: #f2f2f2db;
   }
 
   .urtran-translated {
     font-family: 'Roboto', Helvetica, Arial, sans-serif;
     font-size: 16px;
     font-weight: 500;
-    color: #252525;
+    color: #f2f2f2db;
   }
 
   .urtran-divider {
     width: 100%;
     position: relative;
     margin: 15px 0;
-    border-bottom: 1px dashed #ff5252;
+    border-bottom: 1px dashed #f2f2f2db;
   }
 
   .urtran-select-language {
@@ -290,12 +290,8 @@
     border-width: 1px;
   }
 
-  .urtran-select-language.source {
-    border-color: rgb(255, 82, 82) rgba(255, 82, 82, 0.6) rgba(255, 82, 82, 0.6) rgb(255, 82, 82);
-  }
-
-  .urtran-select-language.target {
-    border-color: rgba(255, 82, 82, 0.6) rgba(255, 82, 82, 0.6) rgb(255, 82, 82) rgb(255, 82, 82);
+  .urtran-select-language.source, .urtran-select-language.target {
+    border-color: #e0d1ce;
   }
 
   .urtran-source-header, .urtran-target-header {
@@ -323,13 +319,14 @@
     margin-top: 20px;
     border: none;
     background: none;
-    color: #ff5252;
-    font-size: 14px;
-    font-weight: 600;
+    color: #e2beb7;
     padding: 4px;
-    outline: rgba(255, 82, 82, 0.4);
+    outline: #e2beb7;
     cursor: pointer;
     box-shadow: none;
+    font-weight: 500;
+    line-height: 1;
+    font-size: 16px;
   }
 
   .urtran-dictionary-text {
@@ -338,9 +335,10 @@
     margin-top: 20px;
     border: none;
     background: none;
-    color: #ff5252;
-    font-size: 14px;
-    font-weight: 600;
+    color: #e2beb7;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1;
     padding: 4px;
     text-align: center;
   }
