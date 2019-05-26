@@ -39,7 +39,7 @@
     width: 28px;
     padding: 2px;
     position: absolute;
-    background-color: #EA7A87;
+    background-color: #343753;
     cursor: pointer;
     border: none;
     border-radius: 5px;
@@ -49,9 +49,9 @@
 
   .urtran-icon-wrapper:focus, .urtran-icon-wrapper:hover, .urtran-icon-wrapper:active {
     outline: none;
-    background-color: #EA7A87;
+    background-color: #343753;
     border: none;
-    box-shadow: rgba(240, 132, 146, 0.68) 0 0 0 2px;
+    box-shadow: #343753 0 0 0 2px;
   }
 
   .urtran-icon {

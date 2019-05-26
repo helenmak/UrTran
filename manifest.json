@@ -9,13 +9,13 @@
   "browser_action": {
     "default_popup": "dist/index.html",
     "default_icon": {
-      "16": "assets/worldwide.png",
+      "16": "assets/worldwide_16.png",
       "32": "assets/worldwide_32.png",
       "48": "assets/worldwide_32.png",
       "128": "assets/worldwide_128.png"
     },
     "icons": {
-      "16": "assets/worldwide.png",
+      "16": "assets/worldwide_16.png",
       "32": "assets/worldwide_32.png",
       "48": "assets/worldwide_32.png",
       "128": "assets/worldwide_128.png"
