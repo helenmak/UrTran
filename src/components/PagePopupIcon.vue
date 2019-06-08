@@ -45,6 +45,7 @@
     border-radius: 5px;
     box-sizing: border-box;
     box-shadow: none;
+    z-index: 2000;
   }
 
   .urtran-icon-wrapper:focus, .urtran-icon-wrapper:hover, .urtran-icon-wrapper:active {
