@@ -1,96 +1,8 @@
 <template>
-  <div class="wrapper">
-    <button
-      v-if="!isDictionaryVisible"
-      class="urtran-main-button"
-      @click="showDictionary"
-    >
-      Show dictionary
-    </button>
-    <button
-      v-else
-      class="urtran-main-button"
-      @click="hideDictionary"
-    >
-      Hide dictionary
-    </button>
-
-    <button
-      v-if="!isLearningCardsVisible"
-      class="urtran-main-button"
-      @click="showLearningCards"
-    >
-      Learn cards
-    </button>
-    <button
-      v-else
-      class="urtran-main-button"
-      @click="hideLearningCards"
-    >
-      End learning
-    </button>
-
-    <section
-      v-if="isDictionaryVisible"
-      class="urtran-dictionary-wrapper"
-    >
-      <div
-        v-if="isDictionaryEmpty"
-        class="urtran-no-items"
-      >
-        Oops, no text yet.
-        Add text from popups on page to dictionary and come back:)
-      </div>
-
-      <div
-        v-else
-        v-for="(item, index) in dictionary"
-        class="urtran-dictionary-content"
-      >
-        <div class="urtran-dictionary-item original">
-          <span class="urtran-language">
-            [ {{item.original.language | uppercase}} ]
-          </span>
-          {{item.original.text}}
-        </div>
-
-        <div class="urtran-dictionary-item translated">
-          <span class="urtran-language">
-            [ {{item.translated.language | uppercase}} ]
-          </span>
-          {{item.translated.text}}
-        </div>
-
-        <div
-          class="urtran-dictionary-action action-icon"
-          @click="removeDictionaryItem(index)"
-        >
-          <remove-icon/>
-        </div>
-
-        <div
-          v-if="!item.learning"
-          class="urtran-dictionary-action action-icon"
-          @click="addToLearning(item, index)"
-        >
-          <learn-icon/>
-        </div>
-        <div
-          v-else
-          class="urtran-dictionary-action action-icon checked-icon"
-        >
-          <success-icon/>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <section
-      v-if="isLearningCardsVisible"
-      class="urtran-learning-wrapper"
-    >
+  <section
+    v-if="visible"
+    class="urtran-learning-wrapper"
+  >
       <div
         v-if="isLearningEmpty"
         class="urtran-no-items"
@@ -186,31 +98,27 @@
       </div>
 
 
-    </section>
-
-  </div>
+</section>
 </template>
 
 <script>
-  import RemoveIcon from '../shared/RemoveIcon'
-  import LearnIcon from '../shared/LearnIcon'
   import SuccessIcon from '../shared/SuccessIcon'
 
   export default {
-    name: 'AppOptions',
-    components: {RemoveIcon, LearnIcon, SuccessIcon},
+    name: 'AppPopupLearning',
+    components: {SuccessIcon},
+    props: {
+      visible: {
+        type: Boolean,
+        default: false
+      }
+    },
     data: () => ({
-      dictionary: null,
-      isDictionaryVisible: false,
       learning: null,
-      isLearningCardsVisible: false,
       learningMode: '',
       visibleLearningCards: []
     }),
     computed: {
-      isDictionaryEmpty() {
-        return !this.dictionary || !this.dictionary.length
-      },
       isLearningEmpty() {
         return !this.learning || !this.learning.length
       },
@@ -220,100 +128,19 @@
     },
     methods: {
       /**
-       * Fetches dictionary data and renders dictionary elements on page. Hides learning cards area.
-       */
-      showDictionary() {
-        this.hideLearningCards()
-        this.isDictionaryVisible = true
-        this.getDictionary()
-      },
-      /**
-       * Gets dictionary from storage and set to component data.
-       */
-      getDictionary() {
-        const self = this
-        chrome.storage.local.get(['dictionary'], function (result) {
-          self.dictionary = result.dictionary
-        })
-      },
-      /**
-       * Removes dictionary data and hides dictionary elements on page
-       */
-      hideDictionary() {
-        this.isDictionaryVisible = false
-        this.dictionary = null
-      },
-      /**
-       * Add original-translated pair of texts to storage learning list.
-       * Marks corresponding item in dictionary as learning
-       * @param {object} item - item to add to list
-       * @param {number} index - item index in list
-       */
-      addToLearning(item, index) {
-        this.markDictionaryItemLearned(index)
-
-        chrome.storage.local.get(['learning'], function (result) {
-          const prevLearning = result.learning || []
-          const newLearning = [...prevLearning, item]
-
-          chrome.storage.local.set({learning: newLearning})
-
-        })
-      },
-      /**
-       * Marks dictionary item as learning
-       * @param {number} index - item index in list
-       */
-      markDictionaryItemLearned(index) {
-        const self = this
-        chrome.storage.local.get(['dictionary'], function (result) {
-          const dictionary = result.dictionary
-          dictionary[index].learning = true
-
-          chrome.storage.local.set({dictionary},
-            function () {
-              self.dictionary = dictionary
-            })
-        })
-      },
-      /**
-       * Removes item from dictionary and component dictionary data
-       * @param {string} index - The index of item in dictionary list.
-       */
-      removeDictionaryItem(index) {
-        const self = this
-        this.dictionary.splice(index, 1)
-        chrome.storage.local.set({dictionary: self.dictionary})
-      },
-      /**
-       * Fetches learning cards and renders them on page. Hides dictionary area.
-       */
-      showLearningCards() {
-        this.hideDictionary()
-        this.isLearningCardsVisible = true
-        this.getLearningCards()
-      },
-      /**
        * Gets learning items from storage and set to component data.
        * Also set corresponding initial cards visibility component data to false.
        */
       getLearningCards() {
         const self = this
+        console.log('getLearningCards')
         chrome.storage.local.get(['learning'], function (result) {
           self.learning = result.learning
+          console.log('after storage getLearningCards')
 
           const learningLength = result.learning ? result.learning.length : 0
           self.visibleLearningCards = [ ...Array.from(Array(learningLength), () => false) ]
         })
-      },
-      /**
-       * Removes learning data and hides learning cards from page
-       */
-      hideLearningCards() {
-        this.isLearningCardsVisible = false
-        this.learning = null
-        this.visibleLearningCards = []
-        this.learningMode = ''
       },
       /**
        * Sets learning cards mode
@@ -321,6 +148,7 @@
        */
       setLearningMode(mode) {
         this.learningMode = mode
+        console.log('set learning mode', this.learningMode, mode)
       },
       /**
        * Shows hidden card. Sets card visibility data to true
@@ -384,6 +212,18 @@
         return (this.learningMode === 'translated' || this.visibleLearningCards[index]) ? 'visible' : 'hidden'
       },
     },
+    watch: {
+      visible (isVisible) {
+        if (isVisible) {
+          this.getLearningCards()
+        } else {
+          this.learning = null
+          this.visibleLearningCards = []
+          this.learningMode = ''
+        }
+        
+      }
+    },
     filters: {
       /**
        * Converts string to uppercased string
@@ -397,35 +237,12 @@
 </script>
 
 <style scoped>
-  .wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 500px;
-    padding: 8px;
-    background-color: #343753;
-  }
-
-  .urtran-dictionary-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-top: 10px;
-    border-top: 1px dashed rgba(242, 242, 242, 0.86);
-  }
-
   .urtran-learning-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin-top: 10px;
     border-top: 1px dashed rgba(242, 242, 242, 0.86);
-  }
-
-  .urtran-dictionary-content {
-    display: flex;
-    flex-direction: row;
-    border-bottom: 1px solid #c0bebe;
-    padding: 10px 5px;
   }
 
   .urtran-learning-content {
@@ -444,25 +261,6 @@
     color: #f2f2f2db;
   }
 
-  .urtran-dictionary-item {
-    flex-basis: 45%;
-    font-size: 16px;
-    line-height: 1.3;
-    text-align: left;
-    overflow-wrap: break-word;
-    color: #f2f2f2db;
-  }
-
-  .urtran-dictionary-item.original {
-    border-right: 1px solid #c0bebe;
-    padding-right: 6px;
-  }
-
-  .urtran-dictionary-item.translated {
-    border-left: 1px solid #c0bebe;
-    padding: 0 2px 0 6px;
-  }
-
   .urtran-learning-item.original {
     border-right: 1px solid #c0bebe;
     padding-right: 6px;
@@ -473,38 +271,10 @@
     padding: 0 2px 0 6px;
   }
 
-  .urtran-dictionary-action {
-    text-align: center;
-    cursor: pointer;
-  }
-
-  .urtran-dictionary-action.action-icon {
-    width: 24px;
-    height: 24px;
-    margin: 0 2px;
-  }
-
-  .urtran-dictionary-action.checked-icon {
-    cursor: auto;
-  }
-
   .urtran-language {
     margin: 0 9px;
     color: #e0d1ce;
     display: inline-block;
-  }
-
-  .urtran-main-button {
-    min-width: 150px;
-    border: 1px solid #e0d1ce;
-    background: none;
-    color: #f2f2f2db;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 4px;
-    margin: 8px;
-    outline: #e0d1ce;
-    cursor: pointer;
   }
 
   .urtran-no-items {

@@ -1,345 +1,110 @@
 <template>
-  <div
-    class="urtran-popup"
-    :class="popupClass"
-    :style="popupPosition"
-    @click.stop
-    @selectstart.stop
-  >
-
-    <div class="urtran-arrow" :class="arrowClass"></div>
-
-    <div class="urtran-source-header">
-      <select
-        class="urtran-select-language source"
-        v-model="sourceLanguage"
-      >
-        <option
-          v-for="language in languages"
-          :value="language.language"
-        >
-          {{language.name}}
-        </option>
-      </select>
-
-      <img
-        class="urtran-flag"
-        v-for="flag in sourceCountriesFlags"
-        :src="flag"
-      >
-    </div>
-
-    <div class="urtran-original">
-      {{selectionText}}
-    </div>
-
-    <div class="urtran-divider"></div>
-
-    <div class="urtran-translated">
-      {{translatedText}}
-    </div>
-
-    <div class="urtran-target-header">
-      <select
-        class="urtran-select-language target"
-        v-model="targetLanguage"
-      >
-        <option
-          v-for="language in languages"
-          :value="language.language"
-        >
-          {{language.name}}
-        </option>
-      </select>
-
-      <img
-        class="urtran-flag"
-        v-for="flag in targetCountriesFlags"
-        :src="flag"
-      >
-    </div>
+  <div class="wrapper">
 
     <button
-      v-if="!addedToDictionary"
-      class="urtran-dictionary-button"
-      @click="addToDictionary"
+      v-if="!isDictionaryVisible"
+      class="urtran-main-button"
+      @click="showDictionary"
     >
-      Add text to dictionary
+      Show dictionary
+    </button>
+    <button
+      v-else
+      class="urtran-main-button"
+      @click="hideDictionary"
+    >
+      Hide dictionary
     </button>
 
-    <div
-      v-else
-      class="urtran-dictionary-text"
+    <button
+      v-if="!isLearningVisible"
+      class="urtran-main-button"
+      @click="showLearningCards"
     >
-      Text added to dictionary!
-    </div>
+      Learn cards
+    </button>
+    <button
+      v-else
+      class="urtran-main-button"
+      @click="hideLearningCards"
+    >
+      End learning
+    </button>
+    
+    <app-popup-dictionary :visible="isDictionaryVisible" />
+    
+    <app-popup-learning :visible="isLearningVisible" />
 
   </div>
 </template>
 
 <script>
-  import api from '../api/'
-  import languagesToCountries from '../languagesToCountries'
+  import AppPopupDictionary from './AppPopupDictionary'
+  import AppPopupLearning from './AppPopupLearning'
 
   export default {
     name: 'AppPopup',
-    props: {
-      top: Number,
-      left: Number,
-      selectionText: String,
-      translations: Object,
-      placement: String
+    components: {
+      AppPopupDictionary,
+      AppPopupLearning
     },
     data: () => ({
-      languages: [],
-      translatedText: '',
-      sourceLanguage: '',
-      browserLanguage: 'uk',
-      targetLanguage: 'uk',
-      sourceCountriesFlags: null,
-      targetCountriesFlags: null,
-      addedToDictionary: false
+      isDictionaryVisible: false,
+      isLearningVisible: false
     }),
-    computed: {
-      /**
-       * Computes popupPosition from top/bottom and left props
-       * @returns {object} - object with absolute popup coordinates
-       */
-      popupPosition() {
-        return {top: `${this.top}px`, left: `${this.left}px`}
-      },
-      /**
-       * Computes popup class based on 'placement' props
-       * @returns {string} - class to add in popup styles
-       */
-      popupClass() {
-        return this.placement
-      },
-      /**
-       * Computes popup arrow class based on placement props
-       * @returns {string} - class to add in arrow styles
-       */
-      arrowClass() {
-        return this.placement === 'top' ? 'bottom' : 'top'
-      }
-    },
-    watch: {
-      /**
-       * Watches for source language changes and fetch translation and source country flag on change
-       * @param {string} newSource - New selected source language.
-       * @param {string} oldSource - Previous source language
-       */
-      sourceLanguage(newSource, oldSource) {
-        if (oldSource && newSource) this.translateText()
-        this.getSourceCountriesFlag()
-      },
-      /**
-       * Watches for target language changes and fetch translation and target country flag on change
-       */
-      targetLanguage() {
-        this.translateText()
-        this.getTargetCountriesFlag()
-      }
-    },
     methods: {
       /**
-       * Calls api to translate text. Set translated text and detected source language to component data
+       * Fetches dictionary data and renders dictionary elements on page. Hides learning cards area.
        */
-      async translateText() {
-        const translations = await api.translateText({
-          text: this.selectionText,
-          target: this.targetLanguage,
-          source: this.sourceLanguage
-        })
-        this.translatedText = translations.translatedText
-        if (translations.detectedSourceLanguage) this.sourceLanguage = translations.detectedSourceLanguage
+      showDictionary() {
+        console.log('handle show dict')
+        this.hideLearningCards()
+        this.isDictionaryVisible = true
       },
       /**
-       * Calls api to get available languages. Set languages to component data
+       * Hides dictionary elements on page
        */
-      async getAvailableLanguages(target) {
-        this.languages = await api.getAvailableLanguages({target})
+      hideDictionary() {
+        console.log('handle hide dict')
+        this.isDictionaryVisible = false
       },
       /**
-       * Adds current source and target languages, original and translated texts to dictionary.
-       * Saves dictionary in storage
+       * Fetches learning cards and renders them on page. Hides dictionary area.
        */
-      addToDictionary() {
-        const self = this
-        chrome.storage.local.get(['dictionary'], function (result) {
-          const prevDictionary = result.dictionary || []
-
-          chrome.storage.local.set(
-            {
-              dictionary: [...prevDictionary,
-                {
-                  original: {text: self.selectionText, language: self.sourceLanguage},
-                  translated: {text: self.translatedText, language: self.targetLanguage}
-                }
-              ]
-            },
-            function () {
-              self.addedToDictionary = true
-            })
-
-        })
+      showLearningCards() {
+        console.log('show learning cards')
+        this.hideDictionary()
+        this.isLearningVisible = true
       },
       /**
-       * Builds src to get flag images
+       * Hides learning cards from page
        */
-      getFlagSrc(countryCode) {
-        return `https://www.countryflags.io/${countryCode}/flat/64.png`
-      },
-      /**
-       * Search for country code for source language and get sources of flag images
-       */
-      getSourceCountriesFlag() {
-        const sourceCountries = languagesToCountries[this.sourceLanguage] || []
-        this.sourceCountriesFlags = sourceCountries.map(this.getFlagSrc)
-      },
-      /**
-       * Search for country code for target language and get sources of flag images
-       */
-      getTargetCountriesFlag() {
-        const targetCountries = languagesToCountries[this.targetLanguage] || []
-        this.targetCountriesFlags = targetCountries.map(this.getFlagSrc)
+      hideLearningCards() {
+        this.isLearningVisible = false
       }
-    },
-    created() {
-      const browserLanguage = navigator.language.slice(0, 2)
-      this.getAvailableLanguages(browserLanguage)
-      this.translatedText = this.translations.translatedText
-      this.sourceLanguage = this.translations.detectedSourceLanguage
-      this.getTargetCountriesFlag()
     }
   }
 </script>
 
 <style scoped>
-  .urtran-popup {
-    position: absolute;
+  .wrapper {
     display: flex;
     flex-direction: column;
-    border: 1px solid #343753;
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.35);
+    width: 500px;
+    padding: 8px;
     background-color: #343753;
-    padding: 20px 15px;
-    max-width: 500px;
-    transform: translateX(-50%);
-    z-index: 1001;
   }
 
-  .urtran-popup.top {
-    transform: translateX(-50%) translateY(-100%);
-  }
-
-  .urtran-arrow {
-    position: absolute;
-    left: 50%;
-    width: 13px;
-    height: 13px;
-    z-index: 1;
-    background-color: #343753;
-    transform: translateX(-50%) rotate(45deg);
-  }
-
-  .urtran-arrow.top {
-    top: -7px;
-    border-top: 1px solid #343753;
-    border-left: 1px solid #343753;
-    box-shadow: -1px -1px 2px 0 rgba(0, 0, 0, 0.25);
-  }
-
-  .urtran-arrow.bottom {
-    bottom: -7px;
-    transform: translateX(-50%) rotate(45deg);
-    border-bottom: 1px solid #343753;
-    border-right: 1px solid #343753;
-    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.25);
-  }
-
-  .urtran-original {
-    font-family: 'Roboto', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    color: #f2f2f2db;
-  }
-
-  .urtran-translated {
-    font-family: 'Roboto', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    color: #f2f2f2db;
-  }
-
-  .urtran-divider {
-    width: 100%;
-    position: relative;
-    margin: 15px 0;
-    border-bottom: 1px dashed #f2f2f2db;
-  }
-
-  .urtran-select-language {
-    background-color: #fff;
+  .urtran-main-button {
     min-width: 150px;
-    width: 50%;
-    font-size: 14px;
-    padding-left: 8px;
-    height: 28px;
-    border-style: solid;
-    border-width: 1px;
-  }
-
-  .urtran-select-language.source, .urtran-select-language.target {
-    border-color: #e0d1ce;
-  }
-
-  .urtran-source-header, .urtran-target-header {
-    display: flex;
-    height: 32px;
-    align-items: center;
-  }
-
-  .urtran-source-header {
-    margin: 0 0 16px;
-  }
-
-  .urtran-target-header {
-    margin: 16px 0 0;
-  }
-
-  .urtran-flag {
-    height: 100%;
-    margin-left: 20px;
-  }
-
-  .urtran-dictionary-button {
-    min-width: 200px;
-    width: 100%;
-    margin-top: 20px;
-    border: none;
+    border: 1px solid #e0d1ce;
     background: none;
-    color: #e2beb7;
+    color: #f2f2f2db;
+    font-size: 16px;
+    font-weight: 500;
     padding: 4px;
-    outline: #e2beb7;
+    margin: 8px;
+    outline: #e0d1ce;
     cursor: pointer;
-    box-shadow: none;
-    font-weight: 500;
-    line-height: 1;
-    font-size: 16px;
-  }
-
-  .urtran-dictionary-text {
-    min-width: 200px;
-    width: 100%;
-    margin-top: 20px;
-    border: none;
-    background: none;
-    color: #e2beb7;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 1;
-    padding: 4px;
-    text-align: center;
   }
 </style>

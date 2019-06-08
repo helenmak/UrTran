@@ -16,7 +16,7 @@
   import WorlwideIcon from '../shared/WorlwideIcon'
 
   export default {
-    name: 'AppPopupIcon',
+    name: 'PagePopupIcon',
     components: {WorlwideIcon},
     props: {
       top: Number,
